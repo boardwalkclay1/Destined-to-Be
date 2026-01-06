@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Numerology Nexus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Auth -->
+    <section id="screen-auth" class="screen">
+      <div class="auth-card">
+        <h1>Numerology Nexus</h1>
+        <div id="auth-toggle">
+          <button id="btn-show-login" class="tab active">Login</button>
+          <button id="btn-show-signup" class="tab">Sign up</button>
+        </div>
+
+        <form id="form-login" class="auth-form">
+          <label>Username
+            <input type="text" id="login-username" autocomplete="username">
+          </label>
+          <label>PIN / Password
+            <input type="password" id="login-password" autocomplete="current-password">
+          </label>
+          <button type="submit" class="primary">Enter</button>
+          <p class="auth-note">Free tier gives life path and daily tips.</p>
+          <p id="login-error" class="error"></p>
+        </form>
+
+        <form id="form-signup" class="auth-form hidden">
+          <label>Username
+            <input type="text" id="signup-username" autocomplete="username">
+          </label>
+          <label>PIN / Password
+            <input type="password" id="signup-password" autocomplete="new-password">
+          </label>
+          <button type="submit" class="primary">Create account</button>
+          <p class="auth-note">No email required. Your data stays on this device.</p>
+          <p id="signup-error" class="error"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Main app layout -->
+    <section id="screen-main" class="screen hidden">
+      <header class="topbar">
+        <h2 id="topbar-title">Dashboard</h2>
+        <button id="btn-open-settings" class="icon-button">⚙</button>
+      </header>
+
+      <nav class="nav">
+        <button data-route="dashboard" class="nav-btn active">Dashboard</button>
+        <button data-route="numbers" class="nav-btn">My Numbers</button>
+        <button data-route="guidance" class="nav-btn">Daily</button>
+        <button data-route="connections" class="nav-btn">Connections</button>
+        <button data-route="readings" class="nav-btn">Readings</button>
+      </nav>
+
+      <main class="content">
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="view active">
+          <h3>Welcome back</h3>
+          <div id="dashboard-life-path" class="card"></div>
+          <div id="dashboard-daily-tip" class="card"></div>
+          <div class="card">
+            <h4>Quick actions</h4>
+            <button id="btn-go-enter-number" class="secondary">Interpret a number you saw</button>
+            <button id="btn-go-upgrade" class="primary">View Pro & Cosmic tiers</button>
+          </div>
+        </section>
+
+        <!-- My Numbers -->
+        <section id="view-numbers" class="view">
+          <h3>My core numbers</h3>
+          <div id="numbers-core" class="card"></div>
+
+          <div class="card">
+            <h4>Number you keep seeing</h4>
+            <label>Enter a number
+              <input type="text" id="input-seen-number" placeholder="111, 222, 1234...">
+            </label>
+            <button id="btn-interpret-number" class="primary">Interpret</button>
+            <div id="seen-number-result" class="tip"></div>
+          </div>
+        </section>
+
+        <!-- Daily Guidance -->
+        <section id="view-guidance" class="view">
+          <h3>Daily guidance</h3>
+          <div id="daily-free" class="card"></div>
+          <div id="daily-pro" class="card locked">
+            <div class="lock-overlay">
+              <p>Unlock Pro to see career and family guidance.</p>
+              <button id="btn-upgrade-from-daily" class="primary">Upgrade to Pro</button>
+            </div>
+            <div id="daily-pro-content" class="hidden"></div>
+          </div>
+        </section>
+
+        <!-- Connections -->
+        <section id="view-connections" class="view">
+          <div class="view-header">
+            <h3>Connections</h3>
+            <button id="btn-add-connection" class="primary small">Add</button>
+          </div>
+
+          <div id="connections-locked" class="card locked">
+            <div class="lock-overlay">
+              <p>Unlock Cosmic Connect to save profiles, match, and message.</p>
+              <button id="btn-upgrade-connections" class="primary">Unlock Cosmic Connect</button>
+            </div>
+          </div>
+
+          <div id="connections-content" class="hidden">
+            <div id="connection-list" class="card"></div>
+            <div id="connection-detail" class="card"></div>
+            <div id="connection-messages" class="card"></div>
+          </div>
+        </section>
+
+        <!-- Readings -->
+        <section id="view-readings" class="view">
+          <h3>Readings</h3>
+          <div class="card">
+            <h4>Free life path reading</h4>
+            <div id="reading-life-path"></div>
+          </div>
+
+          <div class="card locked" id="card-advanced-readings">
+            <div class="lock-overlay">
+              <p>Advanced readings available with Pro Numerology.</p>
+              <button id="btn-upgrade-readings" class="primary">Unlock Pro</button>
+            </div>
+            <div id="reading-advanced" class="hidden"></div>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <!-- Settings modal -->
+    <div id="modal-settings" class="modal hidden">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h3>Settings</h3>
+          <button id="btn-close-settings" class="icon-button">✕</button>
+        </header>
+        <div class="modal-body">
+          <section class="card">
+            <h4>Profile</h4>
+            <label>Name
+              <input type="text" id="settings-name">
+            </label>
+            <label>Bio
+              <textarea id="settings-bio" rows="3"></textarea>
+            </label>
+            <label>Birthdate
+              <input type="date" id="settings-birthdate">
+            </label>
+            <button id="btn-save-profile" class="primary">Save profile</button>
+          </section>
+
+          <section class="card">
+            <h4>Appearance</h4>
+            <label>
+              Theme
+              <select id="settings-theme">
+                <option value="dark">Cosmic dark</option>
+                <option value="light">Starlight</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="card">
+            <h4>Access and tiers</h4>
+            <p id="tier-status"></p>
+            <button id="btn-open-paypal-pro" class="secondary">Upgrade to Pro (PayPal)</button>
+            <button id="btn-open-paypal-social" class="secondary">Unlock Cosmic Connect (PayPal)</button>
+          </section>
+
+          <section class="card danger">
+            <h4>Data</h4>
+            <button id="btn-export-data" class="secondary">Export data (JSON)</button>
+            <button id="btn-reset-all" class="secondary">Reset all data on this device</button>
+            <button id="btn-logout" class="secondary">Log out</button>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
