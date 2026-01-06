@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Numerology Nexus</title>
+  <title>Destined to Be – Numerology Nexus</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,7 +11,9 @@
     <!-- Auth -->
     <section id="screen-auth" class="screen">
       <div class="auth-card">
-        <h1>Numerology Nexus</h1>
+        <h1>Destined to Be</h1>
+        <p class="subtitle">Advanced numerology, fully on your device.</p>
+
         <div id="auth-toggle">
           <button id="btn-show-login" class="tab active">Login</button>
           <button id="btn-show-signup" class="tab">Sign up</button>
@@ -25,7 +27,7 @@
             <input type="password" id="login-password" autocomplete="current-password">
           </label>
           <button type="submit" class="primary">Enter</button>
-          <p class="auth-note">Free tier gives life path and daily tips.</p>
+          <p class="auth-note">Free tier gives life path, daily tips, and number meanings.</p>
           <p id="login-error" class="error"></p>
         </form>
 
@@ -37,7 +39,7 @@
             <input type="password" id="signup-password" autocomplete="new-password">
           </label>
           <button type="submit" class="primary">Create account</button>
-          <p class="auth-note">No email required. Your data stays on this device.</p>
+          <p class="auth-note">Stored only on this device. No servers, no cloud.</p>
           <p id="signup-error" class="error"></p>
         </form>
       </div>
@@ -46,14 +48,18 @@
     <!-- Main app layout -->
     <section id="screen-main" class="screen hidden">
       <header class="topbar">
-        <h2 id="topbar-title">Dashboard</h2>
-        <button id="btn-open-settings" class="icon-button">⚙</button>
+        <div class="topbar-left">
+          <h2 id="topbar-title">Dashboard</h2>
+          <span id="topbar-tier-pill" class="tier-pill">Free</span>
+        </div>
+        <button id="btn-open-settings" class="icon-button" title="Settings">⚙</button>
       </header>
 
       <nav class="nav">
         <button data-route="dashboard" class="nav-btn active">Dashboard</button>
         <button data-route="numbers" class="nav-btn">My Numbers</button>
         <button data-route="guidance" class="nav-btn">Daily</button>
+        <button data-route="ai" class="nav-btn">AI Guide</button>
         <button data-route="connections" class="nav-btn">Connections</button>
         <button data-route="readings" class="nav-btn">Readings</button>
       </nav>
@@ -62,12 +68,18 @@
         <!-- Dashboard -->
         <section id="view-dashboard" class="view active">
           <h3>Welcome back</h3>
+
+          <div id="dashboard-profile" class="card profile-card"></div>
+
           <div id="dashboard-life-path" class="card"></div>
           <div id="dashboard-daily-tip" class="card"></div>
+
           <div class="card">
             <h4>Quick actions</h4>
-            <button id="btn-go-enter-number" class="secondary">Interpret a number you saw</button>
-            <button id="btn-go-upgrade" class="primary">View Pro & Cosmic tiers</button>
+            <div class="quick-actions">
+              <button id="btn-go-enter-number" class="secondary">Interpret a number you saw</button>
+              <button id="btn-go-upgrade" class="primary">View tiers & unlock</button>
+            </div>
           </div>
         </section>
 
@@ -75,13 +87,14 @@
         <section id="view-numbers" class="view">
           <h3>My core numbers</h3>
           <div id="numbers-core" class="card"></div>
+          <div id="numbers-advanced" class="card"></div>
 
           <div class="card">
             <h4>Number you keep seeing</h4>
             <label>Enter a number
-              <input type="text" id="input-seen-number" placeholder="111, 222, 1234...">
+              <input type="text" id="input-seen-number" placeholder="111, 222, 1234..." />
             </label>
-            <button id="btn-interpret-number" class="primary">Interpret</button>
+            <button id="btn-interpret-number" class="primary small-btn">Interpret</button>
             <div id="seen-number-result" class="tip"></div>
           </div>
         </section>
@@ -92,24 +105,46 @@
           <div id="daily-free" class="card"></div>
           <div id="daily-pro" class="card locked">
             <div class="lock-overlay">
-              <p>Unlock Pro to see career and family guidance.</p>
-              <button id="btn-upgrade-from-daily" class="primary">Upgrade to Pro</button>
+              <p>Unlock Pro to see personalized career and family guidance.</p>
+              <button id="btn-upgrade-from-daily" class="primary small-btn">Upgrade to Pro</button>
             </div>
             <div id="daily-pro-content" class="hidden"></div>
           </div>
+        </section>
+
+        <!-- AI Guide (local AI engine) -->
+        <section id="view-ai" class="view">
+          <h3>AI Guide</h3>
+          <div class="card">
+            <p>This guide uses your numerology profile to generate tailored insights directly in your browser.</p>
+            <label>Your current focus
+              <select id="ai-focus">
+                <option value="overview">Life overview</option>
+                <option value="career">Career & money</option>
+                <option value="relationships">Relationships & love</option>
+                <option value="growth">Personal growth & healing</option>
+              </select>
+            </label>
+            <label>Optional: add a question for today
+              <input type="text" id="ai-question" placeholder="What should I focus on this month?" />
+            </label>
+            <button id="btn-ai-generate" class="primary small-btn">Generate insight</button>
+          </div>
+
+          <div id="ai-output" class="card"></div>
         </section>
 
         <!-- Connections -->
         <section id="view-connections" class="view">
           <div class="view-header">
             <h3>Connections</h3>
-            <button id="btn-add-connection" class="primary small">Add</button>
+            <button id="btn-add-connection" class="primary small-btn">Add</button>
           </div>
 
           <div id="connections-locked" class="card locked">
             <div class="lock-overlay">
               <p>Unlock Cosmic Connect to save profiles, match, and message.</p>
-              <button id="btn-upgrade-connections" class="primary">Unlock Cosmic Connect</button>
+              <button id="btn-upgrade-connections" class="primary small-btn">Unlock Cosmic Connect</button>
             </div>
           </div>
 
@@ -131,7 +166,7 @@
           <div class="card locked" id="card-advanced-readings">
             <div class="lock-overlay">
               <p>Advanced readings available with Pro Numerology.</p>
-              <button id="btn-upgrade-readings" class="primary">Unlock Pro</button>
+              <button id="btn-upgrade-readings" class="primary small-btn">Unlock Pro</button>
             </div>
             <div id="reading-advanced" class="hidden"></div>
           </div>
@@ -143,22 +178,31 @@
     <div id="modal-settings" class="modal hidden">
       <div class="modal-content">
         <header class="modal-header">
-          <h3>Settings</h3>
+          <h3>Settings & profile</h3>
           <button id="btn-close-settings" class="icon-button">✕</button>
         </header>
         <div class="modal-body">
           <section class="card">
             <h4>Profile</h4>
+            <div class="avatar-row">
+              <div class="avatar-preview" id="settings-avatar-preview">⟳</div>
+              <div class="avatar-controls">
+                <label class="file-label">
+                  Upload avatar
+                  <input type="file" id="settings-avatar" accept="image/*" />
+                </label>
+              </div>
+            </div>
             <label>Name
-              <input type="text" id="settings-name">
+              <input type="text" id="settings-name" />
             </label>
             <label>Bio
               <textarea id="settings-bio" rows="3"></textarea>
             </label>
             <label>Birthdate
-              <input type="date" id="settings-birthdate">
+              <input type="date" id="settings-birthdate" />
             </label>
-            <button id="btn-save-profile" class="primary">Save profile</button>
+            <button id="btn-save-profile" class="primary small-btn">Save profile</button>
           </section>
 
           <section class="card">
@@ -175,15 +219,15 @@
           <section class="card">
             <h4>Access and tiers</h4>
             <p id="tier-status"></p>
-            <button id="btn-open-paypal-pro" class="secondary">Upgrade to Pro (PayPal)</button>
-            <button id="btn-open-paypal-social" class="secondary">Unlock Cosmic Connect (PayPal)</button>
+            <button id="btn-open-paypal-pro" class="secondary small-btn">Upgrade to Pro (PayPal)</button>
+            <button id="btn-open-paypal-social" class="secondary small-btn">Unlock Cosmic Connect (PayPal)</button>
           </section>
 
           <section class="card danger">
             <h4>Data</h4>
-            <button id="btn-export-data" class="secondary">Export data (JSON)</button>
-            <button id="btn-reset-all" class="secondary">Reset all data on this device</button>
-            <button id="btn-logout" class="secondary">Log out</button>
+            <button id="btn-export-data" class="secondary small-btn">Export data (JSON)</button>
+            <button id="btn-reset-all" class="secondary small-btn">Reset all data on this device</button>
+            <button id="btn-logout" class="secondary small-btn">Log out</button>
           </section>
         </div>
       </div>
