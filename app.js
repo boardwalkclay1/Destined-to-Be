@@ -1,4 +1,4 @@
-// Basic in-memory state
+// ===== STATE =====
 let state = {
   user: null,
   profile: null,
@@ -26,13 +26,13 @@ document.addEventListener("DOMContentLoaded", () => {
   wireNumbers();
   wireConnections();
   wireReadings();
+  wireAI();
   loadStateFromStorage();
   initTheme();
   decideInitialScreen();
 });
 
-/* Utilities */
-
+// ===== UTILITIES =====
 function save(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
@@ -54,19 +54,20 @@ function showToast(msg) {
   setTimeout(() => toast.classList.add("hidden"), 2200);
 }
 
-/* State / initialization */
-
+// ===== STATE INIT =====
 function loadStateFromStorage() {
   state.user = load(STORAGE_KEYS.user);
   state.profile = load(STORAGE_KEYS.profile) || null;
-  state.tiers = load(STORAGE_KEYS.tiers, { proUnlocked: false, socialUnlocked: false }) || {
-    proUnlocked: false,
-    socialUnlocked: false,
-  };
-  state.settings = load(STORAGE_KEYS.settings, { theme: "dark", notificationsEnabled: false }) || {
-    theme: "dark",
-    notificationsEnabled: false,
-  };
+  state.tiers =
+    load(STORAGE_KEYS.tiers, { proUnlocked: false, socialUnlocked: false }) || {
+      proUnlocked: false,
+      socialUnlocked: false,
+    };
+  state.settings =
+    load(STORAGE_KEYS.settings, { theme: "dark", notificationsEnabled: false }) || {
+      theme: "dark",
+      notificationsEnabled: false,
+    };
   state.connections = load(STORAGE_KEYS.connections, []);
   state.messages = load(STORAGE_KEYS.messages, {});
 }
@@ -93,8 +94,7 @@ function decideInitialScreen() {
   }
 }
 
-/* Theme */
-
+// ===== THEME =====
 function initTheme() {
   if (state.settings.theme === "light") {
     document.body.classList.add("light");
@@ -103,8 +103,7 @@ function initTheme() {
   }
 }
 
-/* Auth */
-
+// ===== AUTH =====
 function wireAuthUI() {
   const btnShowLogin = document.getElementById("btn-show-login");
   const btnShowSignup = document.getElementById("btn-show-signup");
@@ -208,8 +207,7 @@ function simpleHash(str) {
   return String(hash);
 }
 
-/* Navigation */
-
+// ===== NAVIGATION =====
 function wireNav() {
   const navButtons = document.querySelectorAll(".nav-btn");
   navButtons.forEach((btn) => {
@@ -235,14 +233,10 @@ function setRoute(route) {
   });
 
   const views = document.querySelectorAll(".view");
-  views.forEach((view) => {
-    view.classList.remove("active");
-  });
+  views.forEach((view) => view.classList.remove("active"));
 
   const targetView = document.getElementById(`view-${route}`);
-  if (targetView) {
-    targetView.classList.add("active");
-  }
+  if (targetView) targetView.classList.add("active");
 
   const title = document.getElementById("topbar-title");
   title.textContent = route.charAt(0).toUpperCase() + route.slice(1);
@@ -250,8 +244,7 @@ function setRoute(route) {
   renderRoute(route);
 }
 
-/* Settings */
-
+// ===== SETTINGS =====
 function wireSettings() {
   const btnOpen = document.getElementById("btn-open-settings");
   const btnClose = document.getElementById("btn-close-settings");
@@ -261,6 +254,7 @@ function wireSettings() {
   const btnLogout = document.getElementById("btn-logout");
   const btnReset = document.getElementById("btn-reset-all");
   const btnExport = document.getElementById("btn-export-data");
+  const avatarInput = document.getElementById("settings-avatar");
 
   btnOpen.addEventListener("click", openSettings);
   btnClose.addEventListener("click", () => modal.classList.add("hidden"));
@@ -270,6 +264,8 @@ function wireSettings() {
     save(STORAGE_KEYS.settings, state.settings);
     initTheme();
   });
+
+  avatarInput.addEventListener("change", handleAvatarUpload);
 
   btnSaveProfile.addEventListener("click", () => {
     const name = document.getElementById("settings-name").value.trim();
@@ -281,10 +277,15 @@ function wireSettings() {
     state.profile.bio = bio;
     state.profile.birthdate = birthdate;
 
-    // Derive numerology when birthdate is set
     if (birthdate) {
       state.profile.lifePath = computeLifePath(birthdate);
-      // Other numbers can be derived similarly or via name
+    }
+
+    if (state.profile.name) {
+      const nameNums = computeNameNumbers(state.profile.name);
+      state.profile.destiny = nameNums.destiny;
+      state.profile.soulUrge = nameNums.soulUrge;
+      state.profile.personality = nameNums.personality;
     }
 
     save(STORAGE_KEYS.profile, state.profile);
@@ -314,7 +315,9 @@ function wireSettings() {
       connections: state.connections,
       messages: state.messages,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -323,14 +326,42 @@ function wireSettings() {
     URL.revokeObjectURL(url);
   });
 
-  document.getElementById("btn-open-paypal-pro").addEventListener("click", () => {
-    // Placeholder: integrate with PayPal Enterprise payment link
-    showToast("Redirecting to PayPal Pro checkout (to be wired).");
+  document
+    .getElementById("btn-open-paypal-pro")
+    .addEventListener("click", () => showToast("PayPal Pro checkout (to be wired)."));
+
+  document
+    .getElementById("btn-open-paypal-social")
+    .addEventListener("click", () =>
+      showToast("PayPal Cosmic Connect checkout (to be wired).")
+    );
+
+  // Dev toggles to unlock tiers locally for testing
+  const tierStatus = document.getElementById("tier-status");
+  tierStatus.insertAdjacentHTML(
+    "afterend",
+    `
+    <button id="dev-unlock-pro" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Pro</button>
+    <button id="dev-unlock-social" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Cosmic Connect</button>
+  `
+  );
+
+  document.getElementById("dev-unlock-pro").addEventListener("click", () => {
+    state.tiers.proUnlocked = !state.tiers.proUnlocked;
+    save(STORAGE_KEYS.tiers, state.tiers);
+    renderAllViews();
+    openSettings();
+    showToast(state.tiers.proUnlocked ? "Pro unlocked (dev)." : "Pro locked (dev).");
   });
 
-  document.getElementById("btn-open-paypal-social").addEventListener("click", () => {
-    // Placeholder: integrate with PayPal Enterprise payment link
-    showToast("Redirecting to PayPal Cosmic Connect checkout (to be wired).");
+  document.getElementById("dev-unlock-social").addEventListener("click", () => {
+    state.tiers.socialUnlocked = !state.tiers.socialUnlocked;
+    save(STORAGE_KEYS.tiers, state.tiers);
+    renderAllViews();
+    openSettings();
+    showToast(
+      state.tiers.socialUnlocked ? "Cosmic Connect unlocked (dev)." : "Cosmic Connect locked (dev)."
+    );
   });
 }
 
@@ -338,31 +369,52 @@ function openSettings() {
   const modal = document.getElementById("modal-settings");
   modal.classList.remove("hidden");
 
-  // Populate fields
   const name = document.getElementById("settings-name");
   const bio = document.getElementById("settings-bio");
   const birthdate = document.getElementById("settings-birthdate");
   const theme = document.getElementById("settings-theme");
   const tierStatus = document.getElementById("tier-status");
+  const avatarPreview = document.getElementById("settings-avatar-preview");
 
   name.value = state.profile?.name || "";
   bio.value = state.profile?.bio || "";
   birthdate.value = state.profile?.birthdate || "";
   theme.value = state.settings.theme;
 
+  if (state.profile?.avatarBase64) {
+    avatarPreview.innerHTML = `<img src="${state.profile.avatarBase64}" alt="avatar" />`;
+  } else {
+    avatarPreview.textContent = initialsForName(state.profile?.name || state.user?.username || "?");
+  }
+
   let msg = "Free tier active.";
   if (state.tiers.proUnlocked) msg += " Pro Numerology unlocked.";
   if (state.tiers.socialUnlocked) msg += " Cosmic Connect unlocked.";
   tierStatus.textContent = msg;
+
+  updateTierPill();
 }
 
-/* Numerology computations (simplified) */
+function handleAvatarUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const base64 = reader.result;
+    state.profile = state.profile || {};
+    state.profile.avatarBase64 = base64;
+    save(STORAGE_KEYS.profile, state.profile);
+    const avatarPreview = document.getElementById("settings-avatar-preview");
+    avatarPreview.innerHTML = `<img src="${base64}" alt="avatar" />`;
+    renderDashboard();
+  };
+  reader.readAsDataURL(file);
+}
 
+// ===== NUMEROLOGY CORE =====
 function computeLifePath(dateStr) {
-  // dateStr: "YYYY-MM-DD"
   const digits = dateStr.replace(/[^0-9]/g, "").split("").map(Number);
   let sum = digits.reduce((a, b) => a + b, 0);
-
   const masterNumbers = [11, 22, 33];
   while (sum > 9 && !masterNumbers.includes(sum)) {
     sum = String(sum)
@@ -373,15 +425,90 @@ function computeLifePath(dateStr) {
   return sum;
 }
 
+const LETTER_MAP = {
+  A: 1,
+  B: 2,
+  C: 3,
+  D: 4,
+  E: 5,
+  F: 6,
+  G: 7,
+  H: 8,
+  I: 9,
+  J: 1,
+  K: 2,
+  L: 3,
+  M: 4,
+  N: 5,
+  O: 6,
+  P: 7,
+  Q: 8,
+  R: 9,
+  S: 1,
+  T: 2,
+  U: 3,
+  V: 4,
+  W: 5,
+  X: 6,
+  Y: 7,
+  Z: 8,
+};
+
+const VOWELS = new Set(["A", "E", "I", "O", "U", "Y"]);
+
+function reduceNumber(n) {
+  const masterNumbers = [11, 22, 33];
+  while (n > 9 && !masterNumbers.includes(n)) {
+    n = String(n)
+      .split("")
+      .map(Number)
+      .reduce((a, b) => a + b, 0);
+  }
+  return n;
+}
+
+function computeNameNumbers(name) {
+  const clean = name.toUpperCase().replace(/[^A-Z]/g, "");
+  if (!clean) return { destiny: null, soulUrge: null, personality: null };
+
+  let total = 0;
+  let vowelTotal = 0;
+  let consonantTotal = 0;
+
+  for (const ch of clean) {
+    const val = LETTER_MAP[ch] || 0;
+    total += val;
+    if (VOWELS.has(ch)) {
+      vowelTotal += val;
+    } else {
+      consonantTotal += val;
+    }
+  }
+
+  const destiny = reduceNumber(total);
+  const soulUrge = reduceNumber(vowelTotal);
+  const personality = reduceNumber(consonantTotal);
+
+  return { destiny, soulUrge, personality };
+}
+
 function interpretSeenNumber(numStr) {
   const cleaned = numStr.replace(/\s+/g, "");
   if (!cleaned) return "Enter a number to interpret.";
 
   if (/^(111|222|333|444|555|666|777|888|999)$/.test(cleaned)) {
-    return `Repeating ${cleaned[0]}s: intensified energy of ${cleaned[0]} asking for your attention.`;
+    return `Repeating ${cleaned[0]}s: intensified energy of ${cleaned[0]} asking for your attention right now.`;
   }
 
-  return "This number is nudging you to stay aware. In Pro, you can unlock a deeper breakdown.";
+  if (/^[0-9]+$/.test(cleaned)) {
+    const digits = cleaned.split("").map(Number);
+    const sum = reduceNumber(digits.reduce((a, b) => a + b, 0));
+    return `This number compresses to ${sum}. ${lifePathSummary(
+      sum
+    )} Ask where this theme is trying to get your attention.`;
+  }
+
+  return "Use only digits. Once entered, the app will map it to a core vibration.";
 }
 
 function lifePathSummary(lp) {
@@ -402,8 +529,60 @@ function lifePathSummary(lp) {
   return map[lp] || "Your life path has its own unique rhythm.";
 }
 
+function destinySummary(n) {
+  if (!n) return "Destiny number not computed yet.";
+  const map = {
+    1: "You are meant to stand out, initiate, and lead — not follow the script.",
+    2: "You are meant to bring people together, soothe conflict, and build bridges.",
+    3: "You are meant to inspire through words, art, and authentic expression.",
+    4: "You are meant to build structures that last — systems, businesses, foundations.",
+    5: "You are meant to experience variety, change, and freedom — and model how to ride it.",
+    6: "You are meant to create safe, beautiful spaces and care for people or communities.",
+    7: "You are meant to seek deeper truths and share distilled wisdom.",
+    8: "You are meant to steward power, resources, and impact in the material world.",
+    9: "You are meant to serve something bigger than yourself and help close old cycles.",
+    11: "Destiny 11: illuminate paths for others through intuition and insight.",
+    22: "Destiny 22: manifest large-scale visions with real, practical structures.",
+    33: "Destiny 33: teach and heal at a heart level, often through service.",
+  };
+  return map[n] || "Your destiny number adds a unique flavor to your path.";
+}
+
+function soulUrgeSummary(n) {
+  if (!n) return "Soul urge not computed yet.";
+  const map = {
+    1: "Deep down, you crave independence and the freedom to choose your own way.",
+    2: "Deep down, you crave harmony, closeness, and emotional safety.",
+    3: "Deep down, you crave expression, play, and being seen in your uniqueness.",
+    4: "Deep down, you crave stability and a sense of solid ground beneath you.",
+    5: "Deep down, you crave variety, adventure, and fresh experiences.",
+    6: "Deep down, you crave being needed and creating a warm, supportive environment.",
+    7: "Deep down, you crave solitude, depth, and honest inner exploration.",
+    8: "Deep down, you crave influence, results, and tangible progress.",
+    9: "Deep down, you crave meaning, compassion, and emotional closure.",
+  };
+  return map[n] || "Your soul urge shows what your heart really wants.";
+}
+
+function personalitySummary(n) {
+  if (!n) return "Personality not computed yet.";
+  const map = {
+    1: "You come across as strong-willed, direct, and self-driven.",
+    2: "You come across as gentle, receptive, and diplomatic.",
+    3: "You come across as lively, expressive, and creative.",
+    4: "You come across as grounded, practical, and reliable.",
+    5: "You come across as restless, curious, and adaptable.",
+    6: "You come across as caring, responsible, and protective.",
+    7: "You come across as thoughtful, reserved, and observant.",
+    8: "You come across as confident, ambitious, and authoritative.",
+    9: "You come across as compassionate, reflective, and mature.",
+  };
+  return map[n] || "Your personality number shows how the world first reads your energy.";
+}
+
 function dailyTipForLifePath(lp) {
-  const generic = "Take one conscious action aligned with what you already know matters.";
+  const generic =
+    "Take one conscious action aligned with what you already know matters.";
   if (!lp) return generic;
   const tips = {
     1: "Lead one small decision today instead of waiting for permission.",
@@ -449,14 +628,174 @@ function familyTipForLifePath(lp) {
   return tips[lp] || "Bring more honesty and presence into your closest bonds today.";
 }
 
-/* Render functions */
+// ===== AI GUIDE ENGINE =====
+function wireAI() {
+  const btn = document.getElementById("btn-ai-generate");
+  const focusSelect = document.getElementById("ai-focus");
+  const questionInput = document.getElementById("ai-question");
+  const outputDiv = document.getElementById("ai-output");
 
+  btn.addEventListener("click", () => {
+    const focus = focusSelect.value;
+    const question = questionInput.value.trim();
+    const insight = generateAIInsight(focus, question);
+    outputDiv.innerHTML = insight;
+  });
+}
+
+function generateAIInsight(focus, question) {
+  const profile = state.profile || {};
+  const lp = profile.lifePath;
+  const destiny = profile.destiny;
+  const soul = profile.soulUrge;
+  const personality = profile.personality;
+
+  if (!lp && !destiny && !soul && !personality) {
+    return "<p>Set your name and birthdate in Settings to unlock a full AI-style reading.</p>";
+  }
+
+  const name = profile.name || "you";
+  const base = [];
+
+  base.push(
+    `<p><strong>Core pattern:</strong> Your life path ${
+      lp ?? "?"
+    } points to ${lifePathSummary(lp)}`
+  );
+
+  if (destiny) {
+    base.push(
+      `<p><strong>Destiny ${destiny}:</strong> ${destinySummary(destiny)}</p>`
+    );
+  }
+
+  if (soul) {
+    base.push(
+      `<p><strong>Soul urge ${soul}:</strong> ${soulUrgeSummary(soul)}</p>`
+    );
+  }
+
+  if (personality) {
+    base.push(
+      `<p><strong>Personality ${personality}:</strong> ${personalitySummary(
+        personality
+      )}</p>`
+    );
+  }
+
+  const focusText = buildFocusLayer(focus, lp, destiny, soul);
+  base.push(`<p>${focusText}</p>`);
+
+  if (question) {
+    base.push(
+      `<p><strong>Reading your question:</strong> "${question}"<br/>` +
+        personalizedQuestionLayer(question, lp, destiny, soul) +
+        `</p>`
+    );
+  }
+
+  base.push(
+    `<p class="tip">All of this is being generated locally in your browser from your numbers. Update your profile to tune the signal.</p>`
+  );
+
+  return base.join("");
+}
+
+function buildFocusLayer(focus, lp, destiny, soul) {
+  const lpText = lp ? lifePathSummary(lp) : "your unique way of moving through life";
+  const dText = destiny ? destinySummary(destiny) : "";
+  const sText = soul ? soulUrgeSummary(soul) : "";
+
+  if (focus === "overview") {
+    return `Right now, the most important thing is to live closer to the center of ${lpText.toLowerCase()}. Your days flow better when your actions respect both ${
+      dText ? "your destiny pattern" : "your long-term direction"
+    } and ${
+      sText ? "what your heart quietly craves" : "what actually energizes you"
+    }.`;
+  }
+
+  if (focus === "career") {
+    return `Career-wise, lean into situations that let you express ${lpText.toLowerCase()}. ${
+      destiny
+        ? "Your destiny number hints that the more you align work with " +
+          dText.toLowerCase() +
+          ", the easier money and opportunity move."
+        : ""
+    } ${
+      soul
+        ? "Your soul urge adds that if your work ignores " +
+          sText.toLowerCase() +
+          ", burnout shows up fast."
+        : ""
+    }`;
+  }
+
+  if (focus === "relationships") {
+    return `In relationships, your life path shows how you naturally show up. Notice where you either over-play or under-play ${lpText.toLowerCase()}. ${
+      soul
+        ? "Your soul urge tells you what you secretly need from connection, even when you do not say it out loud."
+        : "Pay attention to what you actually long for, not just what looks good on paper."
+    }`;
+  }
+
+  if (focus === "growth") {
+    return `For growth and healing, your numbers suggest that the next level is not about becoming someone else, but refining the way you already operate. Start with one small shift that honors your core pattern instead of fighting it.`;
+  }
+
+  return "Bring your daily decisions into alignment with your actual energetic pattern instead of your fear.";
+}
+
+function personalizedQuestionLayer(question, lp, destiny, soul) {
+  let layer = "";
+  const qLow = question.toLowerCase();
+  if (qLow.includes("job") || qLow.includes("career") || qLow.includes("money")) {
+    layer +=
+      "Notice how your question about work or money interacts with your core numbers. ";
+    if (lp === 8 || destiny === 8) {
+      layer +=
+        "You have strong 8 energy, which amplifies themes of power, resources, and responsibility — avoid selling yourself short.";
+    } else if (lp === 4 || destiny === 4) {
+      layer +=
+        "Your 4 energy thrives when you build something step by step; quick fixes usually do not satisfy you for long.";
+    } else {
+      layer +=
+        "Your path may not be about a traditional ladder; look for roles where your natural pattern has space to breathe.";
+    }
+  } else if (qLow.includes("love") || qLow.includes("relationship")) {
+    layer +=
+      "Your question about love is best answered by listening to your soul urge. ";
+    if (soul === 2 || lp === 2) {
+      layer +=
+        "You are wired for partnership and emotional attunement — do not pretend you are fine with half-connection.";
+    } else if (soul === 5 || lp === 5) {
+      layer +=
+        "You need both connection and freedom; design relationships where change is not treated as a threat.";
+    } else {
+      layer +=
+        "Define what safety and aliveness mean for you, and let that standard filter your connections.";
+    }
+  } else {
+    layer +=
+      "Even if your question is not explicitly about career or love, your numbers suggest that your next move should feel like a deeper alignment, not a performance for others.";
+  }
+  return layer;
+}
+
+function initialsForName(name) {
+  const parts = name.trim().split(/\s+/);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() || "?";
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+// ===== RENDER PIPELINE =====
 function renderAllViews() {
   renderDashboard();
   renderNumbers();
   renderDaily();
   renderConnections();
   renderReadings();
+  updateTierPill();
 }
 
 function renderRoute(route) {
@@ -465,12 +804,43 @@ function renderRoute(route) {
   if (route === "guidance") renderDaily();
   if (route === "connections") renderConnections();
   if (route === "readings") renderReadings();
+  if (route === "ai") updateTierPill();
 }
 
+function updateTierPill() {
+  const pill = document.getElementById("topbar-tier-pill");
+  if (!pill) return;
+  const tiers = [];
+  if (state.tiers.proUnlocked) tiers.push("Pro");
+  if (state.tiers.socialUnlocked) tiers.push("Cosmic");
+  pill.textContent = tiers.length ? tiers.join(" + ") : "Free";
+}
+
+// ===== DASHBOARD =====
 function renderDashboard() {
+  const profileDiv = document.getElementById("dashboard-profile");
   const lp = state.profile?.lifePath || null;
   const lifePathDiv = document.getElementById("dashboard-life-path");
   const dailyDiv = document.getElementById("dashboard-daily-tip");
+
+  const name = state.profile?.name || state.user?.username || "Seeker";
+  const bio = state.profile?.bio || "";
+  const birthdate = state.profile?.birthdate || "";
+  const avatarBase64 = state.profile?.avatarBase64 || null;
+
+  const initials = initialsForName(name);
+  const avatarHTML = avatarBase64
+    ? `<div class="profile-avatar"><img src="${avatarBase64}" alt="avatar" /></div>`
+    : `<div class="profile-avatar">${initials}</div>`;
+
+  profileDiv.innerHTML = `
+    ${avatarHTML}
+    <div class="profile-main">
+      <h4>${name}</h4>
+      <p>${bio || "Write a short bio in Settings to anchor your story."}</p>
+      <p><strong>Birthdate:</strong> ${birthdate || "Add in Settings"}</p>
+    </div>
+  `;
 
   if (!lp) {
     lifePathDiv.innerHTML =
@@ -489,20 +859,61 @@ function renderDashboard() {
   `;
 }
 
+// ===== NUMBERS VIEW =====
+function wireNumbers() {
+  const btnInterpret = document.getElementById("btn-interpret-number");
+  const input = document.getElementById("input-seen-number");
+  const result = document.getElementById("seen-number-result");
+
+  btnInterpret.addEventListener("click", () => {
+    const text = input.value.trim();
+    result.textContent = interpretSeenNumber(text);
+  });
+}
+
 function renderNumbers() {
   const coreDiv = document.getElementById("numbers-core");
+  const advDiv = document.getElementById("numbers-advanced");
   const profile = state.profile;
+
   if (!profile?.birthdate) {
     coreDiv.innerHTML =
       "<p>Set your birthdate in Settings to unlock your core numbers.</p>";
+  } else {
+    const lp = profile.lifePath;
+    coreDiv.innerHTML = `
+      <h4>Core numbers</h4>
+      <p><strong>Life path:</strong> ${lp}</p>
+      <p>${lifePathSummary(lp)}</p>
+    `;
+  }
+
+  const destiny = profile?.destiny || null;
+  const soulUrge = profile?.soulUrge || null;
+  const personality = profile?.personality || null;
+
+  if (!profile?.name) {
+    advDiv.innerHTML =
+      "<p>Add your name in Settings so we can decode your destiny, soul urge, and personality numbers.</p>";
     return;
   }
 
-  const lp = profile.lifePath;
-  coreDiv.innerHTML = `
-    <p><strong>Life path:</strong> ${lp}</p>
-    <p>${lifePathSummary(lp)}</p>
+  advDiv.innerHTML = `
+    <h4>Name-based numbers</h4>
+    <p><strong>Destiny:</strong> ${destiny ?? "—"}</p>
+    <p>${destinySummary(destiny)}</p>
+    <p><strong>Soul urge:</strong> ${soulUrge ?? "—"}</p>
+    <p>${soulUrgeSummary(soulUrge)}</p>
+    <p><strong>Personality:</strong> ${personality ?? "—"}</p>
+    <p>${personalitySummary(personality)}</p>
   `;
+}
+
+// ===== DAILY VIEW =====
+function wireDaily() {
+  document
+    .getElementById("btn-upgrade-from-daily")
+    .addEventListener("click", () => openSettings());
 }
 
 function renderDaily() {
@@ -533,31 +944,9 @@ function renderDaily() {
   }
 }
 
-function wireDaily() {
-  document
-    .getElementById("btn-upgrade-from-daily")
-    .addEventListener("click", () => openSettings());
-}
-
-/* Numbers view */
-
-function wireNumbers() {
-  const btnInterpret = document.getElementById("btn-interpret-number");
-  const input = document.getElementById("input-seen-number");
-  const result = document.getElementById("seen-number-result");
-
-  btnInterpret.addEventListener("click", () => {
-    const text = input.value.trim();
-    result.textContent = interpretSeenNumber(text);
-  });
-}
-
-/* Connections */
-
+// ===== CONNECTIONS (COSMIC CONNECT) =====
 function wireConnections() {
   const btnAdd = document.getElementById("btn-add-connection");
-  const connectionsLockedCard = document.getElementById("connections-locked");
-  const connectionsContent = document.getElementById("connections-content");
   const btnUpgradeConnections = document.getElementById("btn-upgrade-connections");
 
   btnUpgradeConnections.addEventListener("click", () => openSettings());
@@ -586,20 +975,16 @@ function wireConnections() {
     save(STORAGE_KEYS.connections, state.connections);
     renderConnections();
   });
+}
 
-  function computeCompatibility(lpA, lpB) {
-    if (!lpA || !lpB) return null;
-    // Extremely simple placeholder compatibility metric
-    const diff = Math.abs(lpA - lpB);
-    if (diff === 0) return 90;
-    if (diff === 1) return 82;
-    if (diff === 2) return 74;
-    if (diff >= 7) return 55;
-    return 68;
-  }
-
-  // Expose to state for use in render
-  window.computeCompatibility = computeCompatibility;
+function computeCompatibility(lpA, lpB) {
+  if (!lpA || !lpB) return null;
+  const diff = Math.abs(lpA - lpB);
+  if (diff === 0) return 90;
+  if (diff === 1) return 82;
+  if (diff === 2) return 74;
+  if (diff >= 7) return 55;
+  return 68;
 }
 
 function renderConnections() {
@@ -628,7 +1013,7 @@ function renderConnections() {
   let html = "<h4>Your connections</h4>";
   state.connections.forEach((conn) => {
     html += `
-      <button class="secondary small" data-conn-id="${conn.id}">
+      <button class="secondary small-btn" data-conn-id="${conn.id}">
         ${conn.name} (LP ${conn.lifePath})
       </button>
     `;
@@ -646,7 +1031,6 @@ function renderConnections() {
     });
   });
 
-  // Show first by default
   renderConnectionDetail(state.connections[0]);
   renderConnectionMessages(state.connections[0]);
 
@@ -657,7 +1041,7 @@ function renderConnections() {
       <p><strong>Birthdate:</strong> ${conn.birthdate}</p>
       <p><strong>Life path:</strong> ${conn.lifePath}</p>
       <p><strong>Compatibility score:</strong> ${score ?? "N/A"}</p>
-      <p>This is a local-only connection. When a backend is added, this can become real matching.</p>
+      <p>This is a local-only connection. When a backend is added, this can become real matching and messaging between devices.</p>
     `;
   }
 
@@ -676,7 +1060,7 @@ function renderConnections() {
     html += `</div>
       <div class="messages-input">
         <textarea id="msg-input-${conn.id}" rows="2" placeholder="Type a message..."></textarea>
-        <button class="primary small" data-send-id="${conn.id}">Send</button>
+        <button class="primary small-btn" data-send-id="${conn.id}">Send</button>
       </div>`;
     messagesDiv.innerHTML = html;
 
@@ -700,14 +1084,19 @@ function renderConnections() {
   }
 }
 
-/* Readings */
-
+// ===== READINGS =====
 function wireReadings() {
-  document.getElementById("btn-upgrade-readings").addEventListener("click", () => openSettings());
+  document
+    .getElementById("btn-upgrade-readings")
+    .addEventListener("click", () => openSettings());
 }
 
 function renderReadings() {
   const lp = state.profile?.lifePath || null;
+  const destiny = state.profile?.destiny || null;
+  const soulUrge = state.profile?.soulUrge || null;
+  const personality = state.profile?.personality || null;
+
   const freeDiv = document.getElementById("reading-life-path");
   const advancedCard = document.getElementById("card-advanced-readings");
   const advancedContent = document.getElementById("reading-advanced");
@@ -722,8 +1111,14 @@ function renderReadings() {
     overlay.classList.add("hidden");
     advancedContent.classList.remove("hidden");
     advancedContent.innerHTML = `
-      <h4>Advanced reading (stub)</h4>
-      <p>Here you will see destiny, soul urge, personality, and your current cycle.</p>
+      <h4>Advanced reading</h4>
+      <p><strong>Destiny:</strong> ${destiny ?? "—"}</p>
+      <p>${destinySummary(destiny)}</p>
+      <p><strong>Soul urge:</strong> ${soulUrge ?? "—"}</p>
+      <p>${soulUrgeSummary(soulUrge)}</p>
+      <p><strong>Personality:</strong> ${personality ?? "—"}</p>
+      <p>${personalitySummary(personality)}</p>
+      <p>This reading is generated fully on your device. No cloud, no account on any server.</p>
     `;
   } else {
     advancedCard.classList.add("locked");
