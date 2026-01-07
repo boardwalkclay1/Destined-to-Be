@@ -1,5 +1,5 @@
 // ===== SOCKET CONFIG =====
-const SOCKET_URL = "http://localhost:3000"; // <-- SET THIS TO YOUR SERVER URL
+const SOCKET_URL = "https://boardwalkclay1.github.io/Destined-to-Be/"; // <-- SET THIS TO YOUR SERVER URL
 
 let socket = null;
 let socketConnected = false;
