@@ -1,5 +1,5 @@
 // ===== CONFIG =====
-const SOCKET_URL = "https://your-socket-server.example.com"; // <-- change to your Socket.IO backend
+const SOCKET_URL = "https://boardwalkclay1.github.io/Destined-to-Be/"; // <-- change to your Socket.IO backend
 
 // ===== STATE =====
 let socket = null;
