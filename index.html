@@ -7,10 +7,8 @@
 
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Socket.IO client -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"
-          integrity="sha384-mGQJfoTqG91d9s0PCMsoKn5aIJL3tYDIymKvGJTd6RFK5g7ImS1xM63tZAkR0q8p"
-          crossorigin="anonymous"></script>
+  <!-- Socket.IO client (no integrity to avoid hash mismatch issues) -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="app">
