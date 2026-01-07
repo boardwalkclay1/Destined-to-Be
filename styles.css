@@ -1,278 +1,450 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Destined to Be – Numerology Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+:root {
+  --bg: #050509;            /* near black */
+  --bg-surface: #0b1020;    /* midnight blue */
+  --primary: #EF4444;       /* red */
+  --primary-soft: #7F1D1D;  /* deep red */
+  --accent: #F97373;        /* softer red */
+  --text-main: #FFFFFF;
+  --text-muted: #C7CBDD;
+  --danger: #F97373;
+  --radius: 16px;
+  --shadow: 0 18px 40px rgba(0,0,0,0.7);
+}
 
-  <link rel="stylesheet" href="styles.css">
+* {
+  box-sizing: border-box;
+}
 
-  <!-- Socket.IO client -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"
-   
-</head>
-<body>
-  <div id="app">
-    <!-- Auth -->
-    <section id="screen-auth" class="screen">
-      <div class="auth-card">
-        <h1>Destined to Be</h1>
-        <p class="subtitle">Midnight numerology with a live Spirit Guide.</p>
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background: radial-gradient(circle at top, #111827 0%, #050509 55%, #000000 100%);
+  color: var(--text-main);
+}
 
-        <div id="auth-toggle">
-          <button id="btn-show-login" class="tab active">Login</button>
-          <button id="btn-show-signup" class="tab">Sign up</button>
-        </div>
+#app {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
 
-        <form id="form-login" class="auth-form">
-          <label>Username
-            <input type="text" id="login-username" autocomplete="username">
-          </label>
-          <label>PIN / Password
-            <input type="password" id="login-password" autocomplete="current-password">
-          </label>
-          <button type="submit" class="primary">Enter</button>
-          <p class="auth-note">Free tier: core numbers, daily tip, and Spirit Guide basics.</p>
-          <p id="login-error" class="error"></p>
-        </form>
+.screen {
+  width: 100%;
+}
 
-        <form id="form-signup" class="auth-form hidden">
-          <label>Username
-            <input type="text" id="signup-username" autocomplete="username">
-          </label>
-          <label>PIN / Password
-            <input type="password" id="signup-password" autocomplete="new-password">
-          </label>
-          <button type="submit" class="primary">Create account</button>
-          <p class="auth-note">Stored on this device and synced live via Socket.IO.</p>
-          <p id="signup-error" class="error"></p>
-        </form>
-      </div>
-    </section>
+.hidden {
+  display: none !important;
+}
 
-    <!-- Main app -->
-    <section id="screen-main" class="screen hidden">
-      <header class="topbar">
-        <div class="topbar-left">
-          <h2 id="topbar-title">Dashboard</h2>
-          <span id="topbar-tier-pill" class="tier-pill">Free</span>
-        </div>
-        <button id="btn-open-settings" class="icon-button" title="Settings">⚙</button>
-      </header>
+/* AUTH */
 
-      <nav class="nav">
-        <button data-route="dashboard" class="nav-btn active">Dashboard</button>
-        <button data-route="profile" class="nav-btn">Profile</button>
-        <button data-route="numbers" class="nav-btn">Numbers</button>
-        <button data-route="readings" class="nav-btn">Readings</button>
-        <button data-route="spirit" class="nav-btn">Spirit Guide</button>
-        <button data-route="learn" class="nav-btn">Learn</button>
-      </nav>
+.auth-card {
+  max-width: 440px;
+  margin: 56px auto;
+  padding: 32px 24px 28px;
+  background: radial-gradient(circle at top, #111827 0%, #050509 70%);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(239,68,68,0.7);
+}
 
-      <main class="content">
-        <!-- Dashboard -->
-        <section id="view-dashboard" class="view active">
-          <h3>Welcome back</h3>
+.auth-card h1 {
+  margin-top: 0;
+  text-align: center;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 20px;
+}
 
-          <div id="dashboard-profile" class="card profile-card"></div>
+.subtitle {
+  margin: 4px 0 10px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
 
-          <div id="dashboard-life-path" class="card"></div>
-          <div id="dashboard-daily-tip" class="card"></div>
+#auth-toggle {
+  display: flex;
+  background: rgba(11,16,32,0.96);
+  border-radius: 999px;
+  padding: 3px;
+  margin-top: 8px;
+}
 
-          <div class="card">
-            <h4>Quick actions</h4>
-            <div class="quick-actions">
-              <button id="btn-dash-complete-profile" class="secondary">Complete profile</button>
-              <button id="btn-dash-see-numbers" class="secondary">See my numbers</button>
-              <button id="btn-dash-open-spirit" class="primary">Ask the Spirit Guide</button>
-            </div>
-          </div>
-        </section>
+.tab {
+  flex: 1;
+  border-radius: 999px;
+  border: none;
+  padding: 8px 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+}
 
-        <!-- Profile -->
-        <section id="view-profile" class="view">
-          <h3>My profile</h3>
-          <div class="card">
-            <h4>Identity</h4>
-            <label>Full birth name (as on birth record)
-              <input type="text" id="profile-full-name" placeholder="First Middle Last">
-            </label>
-            <label>Name you go by now
-              <input type="text" id="profile-preferred-name" placeholder="Preferred name or nickname">
-            </label>
-            <label>Birthdate
-              <input type="date" id="profile-birthdate">
-            </label>
-          </div>
+.tab.active {
+  background: linear-gradient(135deg, var(--primary-soft), var(--primary));
+  color: var(--text-main);
+}
 
-          <div class="card">
-            <h4>Context</h4>
-            <label>What feels like your biggest challenge right now?
-              <textarea id="profile-challenge" rows="3"></textarea>
-            </label>
-            <label>What are you moving toward or building?
-              <textarea id="profile-goal" rows="3"></textarea>
-            </label>
-          </div>
+.auth-form {
+  margin-top: 18px;
+}
 
-          <div class="card">
-            <h4>Avatar</h4>
-            <div class="avatar-row">
-              <div class="avatar-preview" id="profile-avatar-preview">⟳</div>
-              <div class="avatar-controls">
-                <label class="file-label">
-                  Upload avatar
-                  <input type="file" id="profile-avatar" accept="image/*">
-                </label>
-              </div>
-            </div>
-          </div>
+.auth-form label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
 
-          <div class="card">
-            <button id="btn-save-profile-view" class="primary">Save profile & recalc numbers</button>
-          </div>
-        </section>
+.auth-form input,
+.auth-form textarea,
+select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(5,7,18,0.96);
+  color: var(--text-main);
+  font-size: 14px;
+}
 
-        <!-- Numbers -->
-        <section id="view-numbers" class="view">
-          <h3>My numbers</h3>
+button {
+  font: inherit;
+  cursor: pointer;
+}
 
-          <div class="card">
-            <h4>Core path</h4>
-            <div id="numbers-core-path"></div>
-          </div>
+.primary {
+  padding: 10px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: var(--text-main);
+  font-weight: 600;
+}
 
-          <div class="card">
-            <h4>Name-based numbers</h4>
-            <div id="numbers-name-based"></div>
-          </div>
+.secondary {
+  padding: 9px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(249,115,115,0.9);
+  background: transparent;
+  color: var(--text-main);
+  font-weight: 500;
+}
 
-          <div class="card">
-            <h4>Life phases & lessons</h4>
-            <div id="numbers-phases"></div>
-          </div>
+.small-btn {
+  font-size: 13px;
+  padding-block: 7px;
+}
 
-          <div class="card">
-            <h4>Number you keep seeing</h4>
-            <label>Enter a number
-              <input type="text" id="input-seen-number" placeholder="111, 222, 1234, etc.">
-            </label>
-            <button id="btn-interpret-number" class="primary small-btn">Interpret</button>
-            <div id="seen-number-result" class="tip"></div>
-          </div>
-        </section>
+.auth-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 8px;
+}
 
-        <!-- Readings -->
-        <section id="view-readings" class="view">
-          <h3>Readings</h3>
+.error {
+  color: var(--danger);
+  font-size: 12px;
+  min-height: 14px;
+}
 
-          <div class="card">
-            <h4>Free reading: life path focus</h4>
-            <div id="reading-life-path"></div>
-          </div>
+/* MAIN LAYOUT */
 
-          <div class="card locked" id="card-advanced-readings">
-            <div class="lock-overlay">
-              <p>Advanced readings unlock destiny, soul, personality, karmic lessons, and more context.</p>
-              <button id="btn-upgrade-readings" class="primary small-btn">Unlock Pro readings</button>
-            </div>
-            <div id="reading-advanced" class="hidden"></div>
-          </div>
-        </section>
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px;
+}
 
-        <!-- Spirit Guide -->
-        <section id="view-spirit" class="view">
-          <h3>Spirit Guide</h3>
-          <div class="card">
-            <p>Your Spirit Guide explains your map, shows you where to tap next, and translates everything into plain language.</p>
-            <label>What do you want support with right now?
-              <select id="spirit-focus">
-                <option value="tour">Show me how to use this app</option>
-                <option value="numbers">Explain my numbers</option>
-                <option value="decision">Help me with a decision</option>
-                <option value="stuck">I feel stuck or blocked</option>
-                <option value="path">What is my bigger path?</option>
-              </select>
-            </label>
-            <label>Optional: ask Spirit a specific question
-              <input type="text" id="spirit-question" placeholder="Type a question for Spirit">
-            </label>
-            <button id="btn-spirit-generate" class="primary small-btn">Ask the Spirit Guide</button>
-            <button id="btn-spirit-speak" class="secondary small-btn">Let Spirit speak out loud</button>
-          </div>
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-          <div id="spirit-output" class="card"></div>
-        </section>
+.topbar h2 {
+  margin: 0;
+}
 
-        <!-- Learn -->
-        <section id="view-learn" class="view">
-          <h3>Learn the numbers</h3>
-          <div class="card">
-            <h4>Core map</h4>
-            <ul class="learn-list">
-              <li><strong>Life Path:</strong> your main road, from birthdate.</li>
-              <li><strong>Destiny (Expression):</strong> what you are wired to build, from full name.</li>
-              <li><strong>Soul Urge:</strong> what your heart quietly craves, from vowels in your name.</li>
-              <li><strong>Personality:</strong> how others first read you, from consonants.</li>
-              <li><strong>Birthday number:</strong> the flavor added by the day of the month you were born.</li>
-              <li><strong>Maturity:</strong> what you grow into later in life (life path + destiny).</li>
-              <li><strong>Karmic lessons:</strong> numbers missing from your name, showing themes you keep practicing.</li>
-              <li><strong>Balance:</strong> how you tend to respond emotionally when conflict hits.</li>
-            </ul>
-          </div>
+.tier-pill {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(239,68,68,0.2);
+  border: 1px solid rgba(239,68,68,0.7);
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 
-          <div class="card">
-            <h4>How to get the best reading here</h4>
-            <ol class="learn-list">
-              <li>Fill out your Profile with full birth name and accurate birthdate.</li>
-              <li>Save it so the app can calculate all your core numbers.</li>
-              <li>Visit “Numbers” to see the full map.</li>
-              <li>Open “Readings” and unlock Pro if you want deeper interpretation.</li>
-              <li>Talk to the Spirit Guide when you feel confused or stuck.</li>
-            </ol>
-          </div>
-        </section>
-      </main>
-    </section>
+.nav {
+  display: flex;
+  justify-content: space-around;
+  padding-inline: 10px;
+  padding-bottom: 8px;
+  gap: 5px;
+}
 
-    <!-- Settings modal -->
-    <div id="modal-settings" class="modal hidden">
-      <div class="modal-content">
-        <header class="modal-header">
-          <h3>Settings & access</h3>
-          <button id="btn-close-settings" class="icon-button">✕</button>
-        </header>
-        <div class="modal-body">
-          <section class="card">
-            <h4>Theme</h4>
-            <label>
-              Theme
-              <select id="settings-theme">
-                <option value="midnight">Midnight (black, red, midnight blue)</option>
-                <option value="light">Starlight (white, soft red)</option>
-              </select>
-            </label>
-          </section>
+.nav-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 999px;
+  border: none;
+  background: rgba(11,16,32,0.96);
+  color: var(--text-muted);
+  font-size: 11px;
+}
 
-          <section class="card">
-            <h4>Access and tiers</h4>
-            <p id="tier-status"></p>
-            <button id="btn-open-paypal-pro" class="secondary small-btn">Upgrade to Pro (PayPal)</button>
-          </section>
+.nav-btn.active {
+  background: linear-gradient(135deg, var(--primary-soft), var(--primary));
+  color: #ffffff;
+}
 
-          <section class="card danger">
-            <h4>Data</h4>
-            <button id="btn-export-data" class="secondary small-btn">Export data (JSON)</button>
-            <button id="btn-reset-all" class="secondary small-btn">Reset all data on this device</button>
-            <button id="btn-logout" class="secondary small-btn">Log out</button>
-          </section>
-        </div>
-      </div>
-    </div>
+.content {
+  padding: 4px 12px 16px;
+}
 
-    <div id="toast" class="toast hidden"></div>
-  </div>
+.card {
+  background: rgba(11,16,32,0.97);
+  border-radius: var(--radius);
+  padding: 14px 14px 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
 
-  <script src="app.js"></script>
-</body>
-</html>
+.card h4 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* PROFILE CARD */
+
+.profile-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, var(--primary) 0%, #050509 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 20px;
+  border: 1px solid rgba(255,255,255,0.16);
+  overflow: hidden;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-main h4 {
+  margin: 0;
+}
+
+.profile-main p {
+  margin: 2px 0;
+  font-size: 12px;
+}
+
+/* QUICK ACTIONS */
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* LOCK OVERLAY */
+
+.locked {
+  position: relative;
+  overflow: hidden;
+}
+
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(5,5,12,0.98), rgba(11,16,32,0.98));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 16px;
+}
+
+/* MODAL */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal-content {
+  width: min(480px, 96vw);
+  max-height: 80vh;
+  background: rgba(5,5,12,0.98);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(239,68,68,0.8);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.modal-body {
+  padding: 12px 16px 16px;
+  overflow-y: auto;
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+}
+
+/* AVATAR */
+
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.avatar-preview {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, var(--primary) 0%, #050509 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 22px;
+  border: 1px solid rgba(255,255,255,0.16);
+  overflow: hidden;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.file-label input {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+/* TOAST */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 22px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(11,16,32,0.97);
+  border: 1px solid rgba(239,68,68,0.9);
+  color: var(--text-main);
+  font-size: 13px;
+  z-index: 30;
+}
+
+/* DANGER SECTION */
+
+.danger {
+  border-color: rgba(239,68,68,0.9);
+}
+
+/* TIP TEXT */
+
+.tip {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* LEARN LISTS */
+
+.learn-list {
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.learn-list li {
+  margin-bottom: 4px;
+}
+
+/* LIGHT THEME */
+
+body.light {
+  background: radial-gradient(circle at top, #fee2e2 0%, #fef2f2 40%, #fefefe 100%);
+  color: #050509;
+}
+
+body.light .card,
+body.light .auth-card,
+body.light .modal-content {
+  background: #ffffff;
+  color: #050509;
+}
+
+body.light input,
+body.light textarea,
+body.light select {
+  background: #fef2f2;
+  color: #050509;
+}
+
+body.light .nav-btn {
+  background: #fee2e2;
+}
+
+body.light .nav-btn.active {
+  color: #ffffff;
+}
