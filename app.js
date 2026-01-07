@@ -1,12 +1,17 @@
+// ===== CONFIG =====
+const SOCKET_URL = "https://your-socket-server.example.com"; // <-- change to your Socket.IO backend
+
 // ===== STATE =====
+let socket = null;
 let state = {
   user: null,
   profile: null,
   tiers: { proUnlocked: false, socialUnlocked: false },
   settings: { theme: "dark", notificationsEnabled: false },
   currentRoute: "dashboard",
-  connections: [],
-  messages: {},
+  friends: [],           // from server
+  onlineUsers: [],       // from server for map
+  activeChatFriendId: null,
 };
 
 const STORAGE_KEYS = {
@@ -14,19 +19,18 @@ const STORAGE_KEYS = {
   profile: "numerology_profile",
   tiers: "numerology_tiers",
   settings: "numerology_settings",
-  connections: "numerology_connections",
-  messages: "numerology_messages",
 };
 
+// ===== BOOTSTRAP =====
 document.addEventListener("DOMContentLoaded", () => {
   wireAuthUI();
   wireNav();
   wireSettings();
   wireDaily();
   wireNumbers();
-  wireConnections();
-  wireReadings();
-  wireAI();
+  wireConnectionsUI();
+  wireReadingsUI();
+  wireSpiritGuide();
   loadStateFromStorage();
   initTheme();
   decideInitialScreen();
@@ -68,8 +72,6 @@ function loadStateFromStorage() {
       theme: "dark",
       notificationsEnabled: false,
     };
-  state.connections = load(STORAGE_KEYS.connections, []);
-  state.messages = load(STORAGE_KEYS.messages, {});
 }
 
 function persistAll() {
@@ -77,8 +79,6 @@ function persistAll() {
   if (state.profile) save(STORAGE_KEYS.profile, state.profile);
   save(STORAGE_KEYS.tiers, state.tiers);
   save(STORAGE_KEYS.settings, state.settings);
-  save(STORAGE_KEYS.connections, state.connections);
-  save(STORAGE_KEYS.messages, state.messages);
 }
 
 function decideInitialScreen() {
@@ -87,6 +87,7 @@ function decideInitialScreen() {
   if (state.user) {
     screenAuth.classList.add("hidden");
     screenMain.classList.remove("hidden");
+    initSocket();
     renderAllViews();
   } else {
     screenAuth.classList.remove("hidden");
@@ -101,6 +102,51 @@ function initTheme() {
   } else {
     document.body.classList.remove("light");
   }
+}
+
+// ===== SOCKET.IO =====
+function initSocket() {
+  if (socket || !state.user) return;
+
+  socket = io(SOCKET_URL, {
+    transports: ["websocket"],
+  });
+
+  socket.on("connect", () => {
+    socket.emit("auth:hello", {
+      userId: state.user.id,
+      username: state.user.username,
+      profile: state.profile,
+    });
+  });
+
+  socket.on("friends:update", (friends) => {
+    state.friends = friends || [];
+    renderConnections();
+  });
+
+  socket.on("chat:message", (msg) => {
+    handleIncomingChat(msg);
+  });
+
+  socket.on("presence:update", (onlineUsers) => {
+    state.onlineUsers = onlineUsers || [];
+    renderConnectionsMap();
+  });
+
+  socket.on("friend:request:result", (payload) => {
+    const resDiv = document.getElementById("connections-search-result");
+    if (payload.ok) {
+      resDiv.textContent = "Request sent.";
+    } else {
+      resDiv.textContent = payload.error || "Could not send request.";
+    }
+  });
+}
+
+function emitSafe(event, payload) {
+  if (!socket || !socket.connected) return;
+  socket.emit(event, payload);
 }
 
 // ===== AUTH =====
@@ -138,8 +184,9 @@ function wireAuthUI() {
     const salt = crypto.getRandomValues(new Uint32Array(1))[0].toString();
     const passwordHash = simpleHash(password + salt);
 
+    // Local ID; backend should also map this username to its own ID if needed
     state.user = {
-      id: "user-1",
+      id: "user-" + username,
       username,
       passwordHash,
       salt,
@@ -154,13 +201,14 @@ function wireAuthUI() {
       destiny: null,
       soulUrge: null,
       personality: null,
-      themeAccent: "default",
+      sun: null,
+      moon: null,
     };
 
     persistAll();
     error.textContent = "";
     decideInitialScreen();
-    showToast("Account created on this device.");
+    showToast("Account created.");
   });
 
   formLogin.addEventListener("submit", (e) => {
@@ -186,8 +234,7 @@ function wireAuthUI() {
     }
 
     state.user = storedUser;
-    state.profile = load(STORAGE_KEYS.profile);
-    loadStateFromStorage();
+    state.profile = load(STORAGE_KEYS.profile) || state.profile;
     error.textContent = "";
     decideInitialScreen();
     showToast("Welcome back.");
@@ -207,7 +254,7 @@ function simpleHash(str) {
   return String(hash);
 }
 
-// ===== NAVIGATION =====
+// ===== NAV =====
 function wireNav() {
   const navButtons = document.querySelectorAll(".nav-btn");
   navButtons.forEach((btn) => {
@@ -289,7 +336,9 @@ function wireSettings() {
     }
 
     save(STORAGE_KEYS.profile, state.profile);
+    persistAll();
     renderAllViews();
+    emitSafe("profile:update", { userId: state.user.id, profile: state.profile });
     showToast("Profile updated.");
   });
 
@@ -297,12 +346,20 @@ function wireSettings() {
     state.user = null;
     persistAll();
     localStorage.removeItem(STORAGE_KEYS.user);
+    if (socket) {
+      socket.disconnect();
+      socket = null;
+    }
     decideInitialScreen();
   });
 
   btnReset.addEventListener("click", () => {
     if (!confirm("This will erase all numerology data on this device. Continue?")) return;
     Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
+    if (socket) {
+      socket.disconnect();
+      socket = null;
+    }
     location.reload();
   });
 
@@ -312,8 +369,6 @@ function wireSettings() {
       profile: state.profile,
       tiers: state.tiers,
       settings: state.settings,
-      connections: state.connections,
-      messages: state.messages,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: "application/json",
@@ -336,33 +391,37 @@ function wireSettings() {
       showToast("PayPal Cosmic Connect checkout (to be wired).")
     );
 
-  // Dev toggles to unlock tiers locally for testing
+  // Dev toggles
   const tierStatus = document.getElementById("tier-status");
-  tierStatus.insertAdjacentHTML(
-    "afterend",
+  if (!document.getElementById("dev-unlock-pro")) {
+    tierStatus.insertAdjacentHTML(
+      "afterend",
+      `
+      <button id="dev-unlock-pro" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Pro</button>
+      <button id="dev-unlock-social" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Cosmic Connect</button>
     `
-    <button id="dev-unlock-pro" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Pro</button>
-    <button id="dev-unlock-social" class="secondary small-btn" style="margin-top:6px;">Dev: Toggle Cosmic Connect</button>
-  `
-  );
-
-  document.getElementById("dev-unlock-pro").addEventListener("click", () => {
-    state.tiers.proUnlocked = !state.tiers.proUnlocked;
-    save(STORAGE_KEYS.tiers, state.tiers);
-    renderAllViews();
-    openSettings();
-    showToast(state.tiers.proUnlocked ? "Pro unlocked (dev)." : "Pro locked (dev).");
-  });
-
-  document.getElementById("dev-unlock-social").addEventListener("click", () => {
-    state.tiers.socialUnlocked = !state.tiers.socialUnlocked;
-    save(STORAGE_KEYS.tiers, state.tiers);
-    renderAllViews();
-    openSettings();
-    showToast(
-      state.tiers.socialUnlocked ? "Cosmic Connect unlocked (dev)." : "Cosmic Connect locked (dev)."
     );
-  });
+
+    document.getElementById("dev-unlock-pro").addEventListener("click", () => {
+      state.tiers.proUnlocked = !state.tiers.proUnlocked;
+      save(STORAGE_KEYS.tiers, state.tiers);
+      renderAllViews();
+      openSettings();
+      showToast(state.tiers.proUnlocked ? "Pro unlocked (dev)." : "Pro locked (dev).");
+    });
+
+    document.getElementById("dev-unlock-social").addEventListener("click", () => {
+      state.tiers.socialUnlocked = !state.tiers.socialUnlocked;
+      save(STORAGE_KEYS.tiers, state.tiers);
+      renderAllViews();
+      openSettings();
+      showToast(
+        state.tiers.socialUnlocked
+          ? "Cosmic Connect unlocked (dev)."
+          : "Cosmic Connect locked (dev)."
+      );
+    });
+  }
 }
 
 function openSettings() {
@@ -384,7 +443,9 @@ function openSettings() {
   if (state.profile?.avatarBase64) {
     avatarPreview.innerHTML = `<img src="${state.profile.avatarBase64}" alt="avatar" />`;
   } else {
-    avatarPreview.textContent = initialsForName(state.profile?.name || state.user?.username || "?");
+    avatarPreview.textContent = initialsForName(
+      state.profile?.name || state.user?.username || "?"
+    );
   }
 
   let msg = "Free tier active.";
@@ -407,6 +468,7 @@ function handleAvatarUpload(e) {
     const avatarPreview = document.getElementById("settings-avatar-preview");
     avatarPreview.innerHTML = `<img src="${base64}" alt="avatar" />`;
     renderDashboard();
+    emitSafe("profile:update", { userId: state.user.id, profile: state.profile });
   };
   reader.readAsDataURL(file);
 }
@@ -628,164 +690,194 @@ function familyTipForLifePath(lp) {
   return tips[lp] || "Bring more honesty and presence into your closest bonds today.";
 }
 
-// ===== AI GUIDE ENGINE =====
-function wireAI() {
-  const btn = document.getElementById("btn-ai-generate");
-  const focusSelect = document.getElementById("ai-focus");
-  const questionInput = document.getElementById("ai-question");
-  const outputDiv = document.getElementById("ai-output");
-
-  btn.addEventListener("click", () => {
-    const focus = focusSelect.value;
-    const question = questionInput.value.trim();
-    const insight = generateAIInsight(focus, question);
-    outputDiv.innerHTML = insight;
-  });
-}
-
-function generateAIInsight(focus, question) {
-  const profile = state.profile || {};
-  const lp = profile.lifePath;
-  const destiny = profile.destiny;
-  const soul = profile.soulUrge;
-  const personality = profile.personality;
-
-  if (!lp && !destiny && !soul && !personality) {
-    return "<p>Set your name and birthdate in Settings to unlock a full AI-style reading.</p>";
-  }
-
-  const name = profile.name || "you";
-  const base = [];
-
-  base.push(
-    `<p><strong>Core pattern:</strong> Your life path ${
-      lp ?? "?"
-    } points to ${lifePathSummary(lp)}`
-  );
-
-  if (destiny) {
-    base.push(
-      `<p><strong>Destiny ${destiny}:</strong> ${destinySummary(destiny)}</p>`
-    );
-  }
-
-  if (soul) {
-    base.push(
-      `<p><strong>Soul urge ${soul}:</strong> ${soulUrgeSummary(soul)}</p>`
-    );
-  }
-
-  if (personality) {
-    base.push(
-      `<p><strong>Personality ${personality}:</strong> ${personalitySummary(
-        personality
-      )}</p>`
-    );
-  }
-
-  const focusText = buildFocusLayer(focus, lp, destiny, soul);
-  base.push(`<p>${focusText}</p>`);
-
-  if (question) {
-    base.push(
-      `<p><strong>Reading your question:</strong> "${question}"<br/>` +
-        personalizedQuestionLayer(question, lp, destiny, soul) +
-        `</p>`
-    );
-  }
-
-  base.push(
-    `<p class="tip">All of this is being generated locally in your browser from your numbers. Update your profile to tune the signal.</p>`
-  );
-
-  return base.join("");
-}
-
-function buildFocusLayer(focus, lp, destiny, soul) {
-  const lpText = lp ? lifePathSummary(lp) : "your unique way of moving through life";
-  const dText = destiny ? destinySummary(destiny) : "";
-  const sText = soul ? soulUrgeSummary(soul) : "";
-
-  if (focus === "overview") {
-    return `Right now, the most important thing is to live closer to the center of ${lpText.toLowerCase()}. Your days flow better when your actions respect both ${
-      dText ? "your destiny pattern" : "your long-term direction"
-    } and ${
-      sText ? "what your heart quietly craves" : "what actually energizes you"
-    }.`;
-  }
-
-  if (focus === "career") {
-    return `Career-wise, lean into situations that let you express ${lpText.toLowerCase()}. ${
-      destiny
-        ? "Your destiny number hints that the more you align work with " +
-          dText.toLowerCase() +
-          ", the easier money and opportunity move."
-        : ""
-    } ${
-      soul
-        ? "Your soul urge adds that if your work ignores " +
-          sText.toLowerCase() +
-          ", burnout shows up fast."
-        : ""
-    }`;
-  }
-
-  if (focus === "relationships") {
-    return `In relationships, your life path shows how you naturally show up. Notice where you either over-play or under-play ${lpText.toLowerCase()}. ${
-      soul
-        ? "Your soul urge tells you what you secretly need from connection, even when you do not say it out loud."
-        : "Pay attention to what you actually long for, not just what looks good on paper."
-    }`;
-  }
-
-  if (focus === "growth") {
-    return `For growth and healing, your numbers suggest that the next level is not about becoming someone else, but refining the way you already operate. Start with one small shift that honors your core pattern instead of fighting it.`;
-  }
-
-  return "Bring your daily decisions into alignment with your actual energetic pattern instead of your fear.";
-}
-
-function personalizedQuestionLayer(question, lp, destiny, soul) {
-  let layer = "";
-  const qLow = question.toLowerCase();
-  if (qLow.includes("job") || qLow.includes("career") || qLow.includes("money")) {
-    layer +=
-      "Notice how your question about work or money interacts with your core numbers. ";
-    if (lp === 8 || destiny === 8) {
-      layer +=
-        "You have strong 8 energy, which amplifies themes of power, resources, and responsibility — avoid selling yourself short.";
-    } else if (lp === 4 || destiny === 4) {
-      layer +=
-        "Your 4 energy thrives when you build something step by step; quick fixes usually do not satisfy you for long.";
-    } else {
-      layer +=
-        "Your path may not be about a traditional ladder; look for roles where your natural pattern has space to breathe.";
-    }
-  } else if (qLow.includes("love") || qLow.includes("relationship")) {
-    layer +=
-      "Your question about love is best answered by listening to your soul urge. ";
-    if (soul === 2 || lp === 2) {
-      layer +=
-        "You are wired for partnership and emotional attunement — do not pretend you are fine with half-connection.";
-    } else if (soul === 5 || lp === 5) {
-      layer +=
-        "You need both connection and freedom; design relationships where change is not treated as a threat.";
-    } else {
-      layer +=
-        "Define what safety and aliveness mean for you, and let that standard filter your connections.";
-    }
-  } else {
-    layer +=
-      "Even if your question is not explicitly about career or love, your numbers suggest that your next move should feel like a deeper alignment, not a performance for others.";
-  }
-  return layer;
-}
-
 function initialsForName(name) {
   const parts = name.trim().split(/\s+/);
   if (!parts.length) return "?";
   if (parts.length === 1) return parts[0][0]?.toUpperCase() || "?";
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+// ===== SPIRIT GUIDE =====
+function wireSpiritGuide() {
+  const btn = document.getElementById("btn-spirit-generate");
+  const focusSelect = document.getElementById("spirit-focus");
+  const questionInput = document.getElementById("spirit-question");
+  const outputDiv = document.getElementById("spirit-output");
+
+  btn.addEventListener("click", () => {
+    const focus = focusSelect.value;
+    const question = questionInput.value.trim();
+    const html = generateSpiritInsight(focus, question);
+    outputDiv.innerHTML = html + `
+      <button id="spirit-speak" class="secondary small-btn" style="margin-top:8px;">Let Spirit speak</button>
+    `;
+    document.getElementById("spirit-speak").addEventListener("click", () => {
+      const plain = outputDiv.innerText;
+      speakText(plain);
+    });
+  });
+}
+
+function speakText(text) {
+  if (!("speechSynthesis" in window)) {
+    showToast("Speech not supported in this browser.");
+    return;
+  }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = 0.95;
+  utter.pitch = 1.1;
+  utter.lang = "en-US";
+  speechSynthesis.speak(utter);
+}
+
+function generateSpiritInsight(focus, question) {
+  const profile = state.profile || {};
+  const lp = profile.lifePath;
+  const destiny = profile.destiny;
+  const soul = profile.soulUrge;
+  const personality = profile.personality;
+  const sun = profile.sun;
+  const moon = profile.moon;
+
+  if (!lp && !destiny && !soul && !personality && !sun && !moon) {
+    return "<p>Set your name, birthdate, and (optionally) sun/moon in Settings to unlock a full Spirit reading.</p>";
+  }
+
+  const segments = [];
+
+  segments.push(
+    `<p><strong>Core current:</strong> Life path ${
+      lp ?? "?"
+    } flows as ${lifePathSummary(lp)}</p>`
+  );
+
+  if (destiny) {
+    segments.push(`<p><strong>Destiny ${destiny}:</strong> ${destinySummary(destiny)}</p>`);
+  }
+
+  if (soul) {
+    segments.push(`<p><strong>Soul urge ${soul}:</strong> ${soulUrgeSummary(soul)}</p>`);
+  }
+
+  if (personality) {
+    segments.push(
+      `<p><strong>Personality ${personality}:</strong> ${personalitySummary(personality)}</p>`
+    );
+  }
+
+  if (sun || moon) {
+    segments.push(
+      `<p><strong>Sun in ${sun || "?"}</strong> shapes how your light shows in the world, while <strong>Moon in ${
+        moon || "?"
+      }</strong> shapes how you hold and process feelings.</p>`
+    );
+  }
+
+  segments.push(`<p>${buildSpiritFocusLayer(focus, lp, destiny, soul, sun, moon)}</p>`);
+
+  if (question) {
+    segments.push(
+      `<p><strong>Spirit hears your question:</strong> “${question}”<br>${spiritQuestionLayer(
+        question,
+        lp,
+        destiny,
+        soul,
+        sun,
+        moon
+      )}</p>`
+    );
+  }
+
+  segments.push(
+    `<p class="tip">This reading is woven locally from your numbers and signs. Refine your profile to sharpen the voice.</p>`
+  );
+
+  return segments.join("");
+}
+
+function buildSpiritFocusLayer(focus, lp, destiny, soul, sun, moon) {
+  const lpText = lp ? lifePathSummary(lp) : "your unique way of moving through life";
+  const dText = destiny ? destinySummary(destiny) : "";
+  const sText = soul ? soulUrgeSummary(soul) : "";
+
+  if (focus === "overview") {
+    return `Right now, the most important move is to live closer to the center of ${lpText.toLowerCase()}. Your outer path ${
+      dText ? "and destiny pattern" : ""
+    } and your inner craving ${
+      sText ? "of the soul urge" : ""
+    } need to be treated as one rhythm, not separate lives.`;
+  }
+
+  if (focus === "career") {
+    return `In work and money, Spirit is pointing you toward environments that actually respect ${lpText.toLowerCase()}. ${
+      destiny
+        ? "When your career honors " +
+          dText.toLowerCase() +
+          ", your effort multiplies."
+        : ""
+    } ${
+      soul
+        ? "If your job ignores what your heart craves (" +
+          sText.toLowerCase() +
+          "), exhaustion is not a glitch — it is a message."
+        : ""
+    }`;
+  }
+
+  if (focus === "relationships") {
+    return `In love and connection, your life path shows how you naturally move toward and away from people. ${
+      sun
+        ? "Your sun sign colors how boldly you shine in connection, while your moon shows how you retreat to process."
+        : "Notice how different your public self is from the self that appears when you feel safe."
+    } ${
+      soul
+        ? "Your soul urge is the part of you that cannot pretend to be satisfied when it is not."
+        : ""
+    }`;
+  }
+
+  if (focus === "growth") {
+    return `For healing and growth, your numbers suggest that the next level is not about becoming someone else — it is about letting the truest version of you take up more space. Start with one daily habit that honors your natural rhythm instead of fighting it.`;
+  }
+
+  return "Bring your daily decisions into alignment with your actual energetic pattern instead of your fear.";
+}
+
+function spiritQuestionLayer(question, lp, destiny, soul, sun, moon) {
+  const qLow = question.toLowerCase();
+  let layer = "";
+
+  if (qLow.includes("job") || qLow.includes("career") || qLow.includes("money")) {
+    layer += "Spirit is reading your question through the lens of your path and destiny. ";
+    if (lp === 8 || destiny === 8) {
+      layer +=
+        "Strong 8 current means power, resources, and leadership are part of your contract — playing small feels safe but suffocating.";
+    } else if (lp === 4 || destiny === 4) {
+      layer +=
+        "Your 4 energy wants solid structures; quick wins that do not build anything real tend to leave you empty.";
+    } else {
+      layer +=
+        "Instead of chasing generic success, ask: ‘What does success look like for my exact pattern?’";
+    }
+  } else if (qLow.includes("love") || qLow.includes("relationship")) {
+    layer +=
+      "For love, Spirit points to your moon and your soul urge. They show what kind of emotional climate you can actually thrive in. ";
+    if (soul === 2 || lp === 2) {
+      layer +=
+        "You are built for closeness and emotional reciprocity — half-hearted connection drains you more than solitude.";
+    } else if (soul === 5 || lp === 5) {
+      layer +=
+        "You need both freedom and intimacy; agreements that treat change as betrayal are not your home.";
+    } else {
+      layer +=
+        "Define the feeling of ‘home’ in connection before you define the form of the relationship.";
+    }
+  } else {
+    layer +=
+      "Your question is a doorway. Spirit is less interested in the surface detail and more focused on whether your next step is aligned with your deeper pattern rather than your fear of disappointing others.";
+  }
+
+  return layer;
 }
 
 // ===== RENDER PIPELINE =====
@@ -804,7 +896,7 @@ function renderRoute(route) {
   if (route === "guidance") renderDaily();
   if (route === "connections") renderConnections();
   if (route === "readings") renderReadings();
-  if (route === "ai") updateTierPill();
+  if (route === "spirit") updateTierPill();
 }
 
 function updateTierPill() {
@@ -944,148 +1036,253 @@ function renderDaily() {
   }
 }
 
-// ===== CONNECTIONS (COSMIC CONNECT) =====
-function wireConnections() {
-  const btnAdd = document.getElementById("btn-add-connection");
-  const btnUpgradeConnections = document.getElementById("btn-upgrade-connections");
+// ===== CONNECTIONS (FRIENDS + CHAT + MAP) =====
+let mapInstance = null;
+let mapMarkersLayer = null;
 
-  btnUpgradeConnections.addEventListener("click", () => openSettings());
+function wireConnectionsUI() {
+  document
+    .getElementById("btn-upgrade-connections")
+    .addEventListener("click", () => openSettings());
 
-  btnAdd.addEventListener("click", () => {
-    if (!state.tiers.socialUnlocked) {
-      showToast("Unlock Cosmic Connect to add saved connections.");
-      return;
-    }
-    const name = prompt("Connection name:");
-    if (!name) return;
-    const birthdate = prompt("Connection birthdate (YYYY-MM-DD):");
-    if (!birthdate) return;
-
-    const lp = computeLifePath(birthdate);
-    const id = `conn-${Date.now()}`;
-    const connection = {
-      id,
-      name,
-      relation: "",
-      birthdate,
-      lifePath: lp,
-      compatibilityScore: computeCompatibility(lp, state.profile?.lifePath || null),
-    };
-    state.connections.push(connection);
-    save(STORAGE_KEYS.connections, state.connections);
-    renderConnections();
+  document.getElementById("btn-add-connection").addEventListener("click", () => {
+    openFriendSearch();
   });
+
+  document.getElementById("btn-connections-search").addEventListener("click", () => {
+    const value = document.getElementById("connections-search").value.trim();
+    if (!value) return;
+    emitSafe("friend:request", {
+      fromUserId: state.user.id,
+      targetUsername: value,
+    });
+    document.getElementById("connections-search-result").textContent = "Sending request...";
+  });
+
+  document
+    .getElementById("connections-chat-send")
+    .addEventListener("click", sendChatFromInput);
+
+  document
+    .getElementById("connections-share-location")
+    .addEventListener("change", handleLocationToggle);
 }
 
-function computeCompatibility(lpA, lpB) {
-  if (!lpA || !lpB) return null;
-  const diff = Math.abs(lpA - lpB);
-  if (diff === 0) return 90;
-  if (diff === 1) return 82;
-  if (diff === 2) return 74;
-  if (diff >= 7) return 55;
-  return 68;
+function openFriendSearch() {
+  document.getElementById("connections-search").focus();
+}
+
+function handleLocationToggle(e) {
+  const enabled = e.target.checked;
+  if (enabled) {
+    if (!navigator.geolocation) {
+      showToast("Geolocation not supported.");
+      e.target.checked = false;
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        emitSafe("presence:location", {
+          userId: state.user.id,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        showToast("Location shared.");
+      },
+      () => {
+        showToast("Could not get location.");
+        e.target.checked = false;
+      }
+    );
+  } else {
+    emitSafe("presence:location", {
+      userId: state.user.id,
+      lat: null,
+      lng: null,
+    });
+  }
 }
 
 function renderConnections() {
-  const lockedCard = document.getElementById("connections-locked");
-  const content = document.getElementById("connections-content");
-  const listDiv = document.getElementById("connection-list");
-  const detailDiv = document.getElementById("connection-detail");
-  const messagesDiv = document.getElementById("connection-messages");
+  const friendsDiv = document.getElementById("connections-friends");
+  const locked = !state.tiers.socialUnlocked;
 
-  if (!state.tiers.socialUnlocked) {
-    lockedCard.classList.remove("hidden");
-    content.classList.add("hidden");
+  if (locked) {
+    friendsDiv.innerHTML = "<p>Unlock Cosmic Connect to use full friends features.</p>";
     return;
   }
 
-  lockedCard.classList.add("hidden");
-  content.classList.remove("hidden");
-
-  if (!state.connections.length) {
-    listDiv.innerHTML = "<p>No saved connections yet.</p>";
-    detailDiv.innerHTML = "";
-    messagesDiv.innerHTML = "";
+  if (!state.friends || !state.friends.length) {
+    friendsDiv.innerHTML =
+      "<p>You have no friends yet. Send a request using the username above.</p>";
     return;
   }
 
-  let html = "<h4>Your connections</h4>";
-  state.connections.forEach((conn) => {
+  let html = "";
+  state.friends.forEach((f) => {
     html += `
-      <button class="secondary small-btn" data-conn-id="${conn.id}">
-        ${conn.name} (LP ${conn.lifePath})
-      </button>
+      <div>
+        <button class="secondary small-btn" data-friend-id="${f.id}">
+          ${f.name || f.username} ${f.online ? "●" : "○"}
+        </button>
+        <button class="secondary small-btn" data-friend-remove="${f.id}" style="margin-top:4px;">Remove</button>
+      </div>
     `;
   });
-  listDiv.innerHTML = html;
+  friendsDiv.innerHTML = html;
 
-  const buttons = listDiv.querySelectorAll("[data-conn-id]");
-  buttons.forEach((btn) => {
+  friendsDiv.querySelectorAll("[data-friend-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.connId;
-      const conn = state.connections.find((c) => c.id === id);
-      if (!conn) return;
-      renderConnectionDetail(conn);
-      renderConnectionMessages(conn);
+      const id = btn.dataset.friendId;
+      setActiveChatFriend(id);
     });
   });
 
-  renderConnectionDetail(state.connections[0]);
-  renderConnectionMessages(state.connections[0]);
+  friendsDiv.querySelectorAll("[data-friend-remove]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.friendRemove;
+      emitSafe("friend:remove", { userId: state.user.id, friendId: id });
+    });
+  });
 
-  function renderConnectionDetail(conn) {
-    const score = conn.compatibilityScore;
-    detailDiv.innerHTML = `
-      <h4>${conn.name}</h4>
-      <p><strong>Birthdate:</strong> ${conn.birthdate}</p>
-      <p><strong>Life path:</strong> ${conn.lifePath}</p>
-      <p><strong>Compatibility score:</strong> ${score ?? "N/A"}</p>
-      <p>This is a local-only connection. When a backend is added, this can become real matching and messaging between devices.</p>
-    `;
+  if (!state.activeChatFriendId && state.friends.length) {
+    setActiveChatFriend(state.friends[0].id);
+  } else {
+    renderChatThread();
   }
 
-  function renderConnectionMessages(conn) {
-    const thread = state.messages[conn.id] || [];
-    let html = `<h4>Messages with ${conn.name}</h4><div class="messages-thread">`;
-    if (!thread.length) {
-      html += `<p class="tip">Start a local private thread with this connection. Stored on this device only.</p>`;
-    } else {
-      thread.forEach((msg) => {
-        html += `<div class="message"><p>${msg.text}</p><span>${new Date(
-          msg.timestamp
-        ).toLocaleString()}</span></div>`;
-      });
-    }
-    html += `</div>
-      <div class="messages-input">
-        <textarea id="msg-input-${conn.id}" rows="2" placeholder="Type a message..."></textarea>
-        <button class="primary small-btn" data-send-id="${conn.id}">Send</button>
-      </div>`;
-    messagesDiv.innerHTML = html;
+  renderConnectionsMap();
+}
 
-    const btnSend = messagesDiv.querySelector("[data-send-id]");
-    const textarea = messagesDiv.querySelector("textarea");
+function setActiveChatFriend(friendId) {
+  state.activeChatFriendId = friendId;
+  renderChatThread();
+}
 
-    btnSend.addEventListener("click", () => {
-      const text = textarea.value.trim();
-      if (!text) return;
-      const msg = {
-        id: `msg-${Date.now()}`,
-        fromUser: true,
-        text,
-        timestamp: new Date().toISOString(),
-      };
-      if (!state.messages[conn.id]) state.messages[conn.id] = [];
-      state.messages[conn.id].push(msg);
-      save(STORAGE_KEYS.messages, state.messages);
-      renderConnectionMessages(conn);
-    });
+function handleIncomingChat(msg) {
+  // msg: { from, to, text, timestamp }
+  const chatDiv = document.getElementById("connections-chat-thread");
+  if (!chatDiv) return;
+  // Append if it belongs to us
+  if (msg.to === state.user.id || msg.from === state.user.id) {
+    const mine = msg.from === state.user.id;
+    const div = document.createElement("div");
+    div.className = "message" + (mine ? " mine" : "");
+    const friend = state.friends.find((f) => f.id === msg.from || f.id === msg.to);
+    const name = mine ? "You" : friend?.name || friend?.username || "Friend";
+    div.innerHTML = `<p>${msg.text}</p><span>${name} • ${new Date(
+      msg.timestamp
+    ).toLocaleTimeString()}</span>`;
+    chatDiv.appendChild(div);
+    chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
 
-// ===== READINGS =====
-function wireReadings() {
+function sendChatFromInput() {
+  const textarea = document.getElementById("connections-chat-input");
+  const text = textarea.value.trim();
+  if (!text || !state.activeChatFriendId) return;
+  const payload = {
+    from: state.user.id,
+    to: state.activeChatFriendId,
+    text,
+    timestamp: new Date().toISOString(),
+  };
+  emitSafe("chat:message", payload);
+  handleIncomingChat(payload); // optimistic render
+  textarea.value = "";
+}
+
+function renderChatThread() {
+  const chatDiv = document.getElementById("connections-chat-thread");
+  const title = document.getElementById("connections-chat-title");
+
+  const friend = state.friends.find((f) => f.id === state.activeChatFriendId);
+  if (!friend) {
+    title.textContent = "Messages";
+    chatDiv.innerHTML = "<p class='tip'>Select a friend to start chatting.</p>";
+    return;
+  }
+
+  title.textContent = `Chat with ${friend.name || friend.username}`;
+  // Real history should come from backend; here assume server may emit history separately if desired
+  chatDiv.innerHTML = "<p class='tip'>Messages will appear here as you chat.</p>";
+}
+
+function renderConnectionsMap() {
+  const mapDiv = document.getElementById("connections-map");
+  if (!mapDiv) return;
+  if (!state.tiers.socialUnlocked) {
+    mapDiv.innerHTML = "";
+    return;
+  }
+
+  if (!mapInstance) {
+    mapInstance = L.map("connections-map").setView([0, 0], 2);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+    }).addTo(mapInstance);
+    mapMarkersLayer = L.layerGroup().addTo(mapInstance);
+  }
+
+  mapMarkersLayer.clearLayers();
+  const withLocation = state.onlineUsers.filter((u) => u.lat && u.lng);
+  if (!withLocation.length) return;
+
+  withLocation.forEach((u) => {
+    const marker = L.marker([u.lat, u.lng]).addTo(mapMarkersLayer);
+    marker.bindPopup(`${u.name || u.username}`);
+  });
+
+  // Center roughly on first user
+  const first = withLocation[0];
+  mapInstance.setView([first.lat, first.lng], 3);
+}
+
+// ===== READINGS (NUMEROLOGY + ASTRO) =====
+function wireReadingsUI() {
+  // Sun/Moon select options
+  const signs = [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces",
+  ];
+  const sunSelect = document.getElementById("reading-sun-sign");
+  const moonSelect = document.getElementById("reading-moon-sign");
+
+  signs.forEach((s) => {
+    const opt1 = document.createElement("option");
+    opt1.value = s;
+    opt1.textContent = s;
+    sunSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = s;
+    opt2.textContent = s;
+    moonSelect.appendChild(opt2);
+  });
+
+  document.getElementById("reading-save-astro").addEventListener("click", () => {
+    const sunVal = sunSelect.value || null;
+    const moonVal = moonSelect.value || null;
+    state.profile = state.profile || {};
+    state.profile.sun = sunVal;
+    state.profile.moon = moonVal;
+    save(STORAGE_KEYS.profile, state.profile);
+    persistAll();
+    renderReadings();
+    showToast("Astro profile saved.");
+  });
+
   document
     .getElementById("btn-upgrade-readings")
     .addEventListener("click", () => openSettings());
@@ -1096,6 +1293,12 @@ function renderReadings() {
   const destiny = state.profile?.destiny || null;
   const soulUrge = state.profile?.soulUrge || null;
   const personality = state.profile?.personality || null;
+  const sun = state.profile?.sun || null;
+  const moon = state.profile?.moon || null;
+
+  // set dropdown defaults
+  if (sun) document.getElementById("reading-sun-sign").value = sun;
+  if (moon) document.getElementById("reading-moon-sign").value = moon;
 
   const freeDiv = document.getElementById("reading-life-path");
   const advancedCard = document.getElementById("card-advanced-readings");
@@ -1110,19 +1313,51 @@ function renderReadings() {
     advancedCard.classList.remove("locked");
     overlay.classList.add("hidden");
     advancedContent.classList.remove("hidden");
-    advancedContent.innerHTML = `
-      <h4>Advanced reading</h4>
+
+    let html = `
+      <h4>Advanced numerology</h4>
       <p><strong>Destiny:</strong> ${destiny ?? "—"}</p>
       <p>${destinySummary(destiny)}</p>
       <p><strong>Soul urge:</strong> ${soulUrge ?? "—"}</p>
       <p>${soulUrgeSummary(soulUrge)}</p>
       <p><strong>Personality:</strong> ${personality ?? "—"}</p>
       <p>${personalitySummary(personality)}</p>
-      <p>This reading is generated fully on your device. No cloud, no account on any server.</p>
     `;
+
+    html += `<h4>Astro blend</h4>`;
+    if (sun || moon) {
+      html += `
+        <p><strong>Sun in ${sun || "?"}</strong> shows where you shine steadily.</p>
+        <p><strong>Moon in ${moon || "?"}</strong> shows how you emotionally process and self-soothe.</p>
+      `;
+    } else {
+      html += `<p>Add your sun and moon to unlock this layer.</p>`;
+    }
+
+    if (lp || sun || moon) {
+      html += `<p><strong>Synthesis:</strong> Your life path ${lp || "?"} moves through the world in a ${
+        sun || "?"
+      } / ${moon || "?"} costume. When your daily actions match both your path and your emotional truth, you feel less split inside.</p>`;
+    }
+
+    advancedContent.innerHTML = html;
   } else {
     advancedCard.classList.add("locked");
     overlay.classList.remove("hidden");
     advancedContent.classList.add("hidden");
   }
 }
+
+// ===== RENDER DAILY, CONNECTIONS ENTRY =====
+function renderConnections() {
+  if (!document.getElementById("connections-friends")) return;
+  if (!state.tiers.socialUnlocked) {
+    document.getElementById("connections-friends").innerHTML =
+      "<p>Unlock Cosmic Connect to use full friends features.</p>";
+    return;
+  }
+  // friends are rendered earlier when socket event fires; just ensure map is drawn
+  renderConnectionsMap();
+}
+
+// ===== END =====
