@@ -2,9 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Destined to Be – Numerology Nexus</title>
+  <title>Destined to Be – Spirit Numerology</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Socket.IO client -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"
+          integrity="sha384-mGQJfoTqG91d9s0PCMsoKn5aIJL3tYDIymKvGJTd6RFK5g7ImS1xM63tZAkR0q8p"
+          crossorigin="anonymous"></script>
+
+  <!-- Leaflet (map) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+4JtJtM6+g7Vjv8s+2kLQvP0LhM651Emp01/O9vr0="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-SmSr9w+ywH6kRykGq5H3ZiZsa1onbI7VUu01sB8Jk0A="
+    crossorigin=""
+  ></script>
 </head>
 <body>
   <div id="app">
@@ -12,7 +30,7 @@
     <section id="screen-auth" class="screen">
       <div class="auth-card">
         <h1>Destined to Be</h1>
-        <p class="subtitle">Advanced numerology, fully on your device.</p>
+        <p class="subtitle">Spirit-guided numerology, live and cosmic.</p>
 
         <div id="auth-toggle">
           <button id="btn-show-login" class="tab active">Login</button>
@@ -39,7 +57,7 @@
             <input type="password" id="signup-password" autocomplete="new-password">
           </label>
           <button type="submit" class="primary">Create account</button>
-          <p class="auth-note">Stored only on this device. No servers, no cloud.</p>
+          <p class="auth-note">Stored locally + synced by Socket.IO backend.</p>
           <p id="signup-error" class="error"></p>
         </form>
       </div>
@@ -59,7 +77,7 @@
         <button data-route="dashboard" class="nav-btn active">Dashboard</button>
         <button data-route="numbers" class="nav-btn">My Numbers</button>
         <button data-route="guidance" class="nav-btn">Daily</button>
-        <button data-route="ai" class="nav-btn">AI Guide</button>
+        <button data-route="spirit" class="nav-btn">Spirit Guide</button>
         <button data-route="connections" class="nav-btn">Connections</button>
         <button data-route="readings" class="nav-btn">Readings</button>
       </nav>
@@ -112,46 +130,68 @@
           </div>
         </section>
 
-        <!-- AI Guide (local AI engine) -->
-        <section id="view-ai" class="view">
-          <h3>AI Guide</h3>
+        <!-- Spirit Guide -->
+        <section id="view-spirit" class="view">
+          <h3>Spirit Guide</h3>
           <div class="card">
-            <p>This guide uses your numerology profile to generate tailored insights directly in your browser.</p>
+            <p>Your Spirit Guide weaves your numbers and signs into live insight.</p>
             <label>Your current focus
-              <select id="ai-focus">
+              <select id="spirit-focus">
                 <option value="overview">Life overview</option>
                 <option value="career">Career & money</option>
                 <option value="relationships">Relationships & love</option>
                 <option value="growth">Personal growth & healing</option>
               </select>
             </label>
-            <label>Optional: add a question for today
-              <input type="text" id="ai-question" placeholder="What should I focus on this month?" />
+            <label>Optional: ask Spirit a question for today
+              <input type="text" id="spirit-question" placeholder="What should I focus on this month?" />
             </label>
-            <button id="btn-ai-generate" class="primary small-btn">Generate insight</button>
+            <button id="btn-spirit-generate" class="primary small-btn">Call in Spirit</button>
           </div>
 
-          <div id="ai-output" class="card"></div>
+          <div id="spirit-output" class="card"></div>
         </section>
 
         <!-- Connections -->
         <section id="view-connections" class="view">
           <div class="view-header">
             <h3>Connections</h3>
-            <button id="btn-add-connection" class="primary small-btn">Add</button>
+            <button id="btn-add-connection" class="primary small-btn">Add friend</button>
           </div>
 
-          <div id="connections-locked" class="card locked">
-            <div class="lock-overlay">
-              <p>Unlock Cosmic Connect to save profiles, match, and message.</p>
-              <button id="btn-upgrade-connections" class="primary small-btn">Unlock Cosmic Connect</button>
+          <div class="card">
+            <h4>Find user</h4>
+            <label>Username
+              <input type="text" id="connections-search" placeholder="friend username" />
+            </label>
+            <button id="btn-connections-search" class="secondary small-btn">Send friend request</button>
+            <div id="connections-search-result" class="tip"></div>
+          </div>
+
+          <div class="card">
+            <h4>Share location</h4>
+            <label class="toggle-row">
+              <input type="checkbox" id="connections-share-location" />
+              <span>Show me on the map when I’m online</span>
+            </label>
+            <div id="connections-map" class="map-container"></div>
+          </div>
+
+          <div id="connections-main" class="card">
+            <div class="connections-columns">
+              <div class="connections-list">
+                <h4>Friends</h4>
+                <div id="connections-friends"></div>
+              </div>
+              <div class="connections-chat">
+                <h4 id="connections-chat-title">Messages</h4>
+                <div id="connections-chat-thread" class="messages-thread"></div>
+                <div class="messages-input">
+                  <textarea id="connections-chat-input" rows="2" placeholder="Type a message..."></textarea>
+                  <button id="connections-chat-send" class="primary small-btn">Send</button>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div id="connections-content" class="hidden">
-            <div id="connection-list" class="card"></div>
-            <div id="connection-detail" class="card"></div>
-            <div id="connection-messages" class="card"></div>
           </div>
         </section>
 
@@ -161,6 +201,17 @@
           <div class="card">
             <h4>Free life path reading</h4>
             <div id="reading-life-path"></div>
+          </div>
+
+          <div class="card">
+            <h4>Astrology</h4>
+            <label>Sun sign
+              <select id="reading-sun-sign"></select>
+            </label>
+            <label>Moon sign
+              <select id="reading-moon-sign"></select>
+            </label>
+            <button id="reading-save-astro" class="secondary small-btn">Save astro profile</button>
           </div>
 
           <div class="card locked" id="card-advanced-readings">
