@@ -1,10 +1,18 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
+import cors from "cors";
 
 const app = express();
+
+// Allow all origins (you can restrict later)
+app.use(cors());
+app.use(express.json());
+
+// Create HTTP server
 const server = http.createServer(app);
 
+// Create Socket.IO server
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -12,154 +20,71 @@ const io = new Server(server, {
   }
 });
 
-// In-memory storage (replace with DB later if you want)
-const users = {};        // userId → { username, socketId, profile, lat, lng }
-const friends = {};      // userId → [friendUserIds]
-const pendingRequests = {}; // userId → [incoming friend requests]
-
-// Broadcast presence to all users
-function broadcastPresence() {
-  const online = Object.values(users).map(u => ({
-    id: u.userId,
-    username: u.username,
-    name: u.profile?.name,
-    lat: u.lat,
-    lng: u.lng
-  }));
-  io.emit("presence:update", online);
-}
+// Store connected users (optional)
+const connectedUsers = new Map();
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log(`🔌 Socket connected: ${socket.id}`);
 
-  // User identifies themselves
-  socket.on("auth:hello", ({ userId, username, profile }) => {
-    users[userId] = {
-      userId,
-      username,
-      profile,
-      socketId: socket.id,
-      lat: null,
-      lng: null
-    };
+  // When frontend announces itself
+  socket.on("auth:hello", (data) => {
+    console.log("👤 User connected:", data);
 
-    if (!friends[userId]) friends[userId] = [];
-    if (!pendingRequests[userId]) pendingRequests[userId] = [];
-
-    broadcastPresence();
-
-    // Send friend list to user
-    const friendList = friends[userId].map(fid => {
-      const u = users[fid];
-      return {
-        id: fid,
-        username: u?.username,
-        name: u?.profile?.name,
-        online: !!u
-      };
+    connectedUsers.set(socket.id, {
+      userId: data.userId,
+      username: data.username,
+      profile: data.profile,
+      numbers: data.numbers
     });
-    io.to(socket.id).emit("friends:update", friendList);
+
+    // Optional: broadcast presence
+    // io.emit("presence:update", Array.from(connectedUsers.values()));
   });
 
-  // Update profile
-  socket.on("profile:update", ({ userId, profile }) => {
-    if (users[userId]) {
-      users[userId].profile = profile;
-      broadcastPresence();
-    }
-  });
+  // Profile updates
+  socket.on("profile:update", (payload) => {
+    console.log("📄 Profile update received:", payload);
 
-  // Friend request
-  socket.on("friend:request", ({ fromUserId, targetUsername }) => {
-    const target = Object.values(users).find(u => u.username === targetUsername);
-    if (!target) {
-      io.to(users[fromUserId].socketId).emit("friend:request:result", {
-        ok: false,
-        error: "User not found"
-      });
-      return;
-    }
-
-    pendingRequests[target.userId].push(fromUserId);
-
-    io.to(users[fromUserId].socketId).emit("friend:request:result", {
-      ok: true
+    // Save/update in memory
+    connectedUsers.set(socket.id, {
+      ...connectedUsers.get(socket.id),
+      profile: payload.profile,
+      numbers: payload.numbers
     });
+
+    // Echo back to the same user (or broadcast if you want)
+    socket.emit("profile:update", payload);
   });
 
-  // Accept friend
-  socket.on("friend:accept", ({ userId, fromUserId }) => {
-    if (!friends[userId].includes(fromUserId)) friends[userId].push(fromUserId);
-    if (!friends[fromUserId].includes(userId)) friends[fromUserId].push(userId);
+  // Spirit Guide question
+  socket.on("spirit:question", (payload) => {
+    console.log("🔮 Spirit question:", payload);
 
-    pendingRequests[userId] = pendingRequests[userId].filter(id => id !== fromUserId);
-
-    const update = (uid) => {
-      const list = friends[uid].map(fid => {
-        const u = users[fid];
-        return {
-          id: fid,
-          username: u?.username,
-          name: u?.profile?.name,
-          online: !!u
-        };
-      });
-      if (users[uid]) io.to(users[uid].socketId).emit("friends:update", list);
+    // Basic server-side Spirit response
+    const reply = {
+      text: `Spirit received your question: "${payload.question || "no question"}". 
+      Your numbers show movement is possible. Trust the next small step.`
     };
 
-    update(userId);
-    update(fromUserId);
+    // Send back to the same user
+    socket.emit("spirit:message", reply);
   });
 
-  // Remove friend
-  socket.on("friend:remove", ({ userId, friendId }) => {
-    friends[userId] = friends[userId].filter(id => id !== friendId);
-    friends[friendId] = friends[friendId].filter(id => id !== userId);
-
-    const update = (uid) => {
-      const list = friends[uid].map(fid => {
-        const u = users[fid];
-        return {
-          id: fid,
-          username: u?.username,
-          name: u?.profile?.name,
-          online: !!u
-        };
-      });
-      if (users[uid]) io.to(users[uid].socketId).emit("friends:update", list);
-    };
-
-    update(userId);
-    update(friendId);
-  });
-
-  // Chat
-  socket.on("chat:message", (msg) => {
-    const { to } = msg;
-    const target = users[to];
-    if (target) {
-      io.to(target.socketId).emit("chat:message", msg);
-    }
-  });
-
-  // Location updates
-  socket.on("presence:location", ({ userId, lat, lng }) => {
-    if (users[userId]) {
-      users[userId].lat = lat;
-      users[userId].lng = lng;
-      broadcastPresence();
-    }
-  });
-
+  // Handle disconnect
   socket.on("disconnect", () => {
-    const userId = Object.keys(users).find(id => users[id].socketId === socket.id);
-    if (userId) {
-      delete users[userId];
-      broadcastPresence();
-    }
+    console.log(`❌ Socket disconnected: ${socket.id}`);
+    connectedUsers.delete(socket.id);
   });
 });
 
-server.listen(3000, () => {
-  console.log("Socket.IO server running on port 3000");
+// Root route
+app.get("/", (req, res) => {
+  res.send("Destined-to-Be Socket.IO server is running.");
+});
+
+// Use PORT from environment or fallback
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`🚀 Socket.IO server running on port ${PORT}`);
 });
