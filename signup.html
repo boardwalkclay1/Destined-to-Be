@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/auth/signup.js"></script>
+</head>
+
+<body class="auth-body">
+  <div class="auth-container">
+    <h1>Destined to Be</h1>
+    <p class="subtitle">Create your midnight numerology profile.</p>
+
+    <form id="signup-form" class="auth-form">
+      <label>Username
+        <input type="text" id="signup-username" autocomplete="username" required>
+      </label>
+
+      <label>PIN / Password
+        <input type="password" id="signup-password" autocomplete="new-password" required>
+      </label>
+
+      <button type="submit" class="primary-btn">Create Account</button>
+      <p id="signup-error" class="error"></p>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account? <a href="login.html">Login</a>
+    </p>
+  </div>
+</body>
+</html>
