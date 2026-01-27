@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spirit Guide – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/tier.js"></script>
+  <script type="module" src="js/spirit/spirit.js"></script>
+  <script type="module" src="js/spirit/guide-engine.js"></script>
+  <script type="module" src="js/spirit/guide-modes.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Spirit Guide</h2>
+    <a href="settings.html" class="icon-btn">⚙</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <p>Your Spirit Guide explains your map and shows you where to tap next.</p>
+
+      <label>What do you want support with?
+        <select id="guide-focus">
+          <option value="tour">Show me how to use this app</option>
+          <option value="numbers">Explain my numbers</option>
+          <option value="decision">Help me with a decision</option>
+          <option value="stuck">I feel stuck</option>
+          <option value="path">What is my bigger path</option>
+        </select>
+      </label>
+
+      <div id="guide-extra"></div>
+
+      <button id="ask-guide" class="primary-btn">Ask the Spirit Guide</button>
+
+      <div id="guide-output" class="guide-output"></div>
+    </section>
+  </main>
+</body>
+</html>
