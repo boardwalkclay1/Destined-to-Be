@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/tier.js"></script>
+  <script type="module" src="js/dashboard/dashboard.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Dashboard</h2>
+    <div class="topbar-right">
+      <span id="tier-pill" class="tier-pill">Free</span>
+      <a href="settings.html" class="icon-btn">⚙</a>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="card" id="profile-card"></section>
+    <section class="card" id="life-path-card"></section>
+    <section class="card" id="daily-tip-card"></section>
+
+    <section class="card">
+      <h3>Quick Actions</h3>
+      <div class="quick-actions">
+        <a href="profile.html" class="secondary-btn">Complete Profile</a>
+        <a href="numbers.html" class="secondary-btn">See My Numbers</a>
+        <a href="spirit.html" class="primary-btn">Ask the Spirit Guide</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
