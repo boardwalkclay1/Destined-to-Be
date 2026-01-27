@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/profile/profile.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Profile</h2>
+    <a href="settings.html" class="icon-btn">⚙</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Identity</h3>
+
+      <label>Full Birth Name
+        <input type="text" id="full-name">
+      </label>
+
+      <label>Preferred Name
+        <input type="text" id="preferred-name">
+      </label>
+
+      <label>Birthdate
+        <input type="date" id="birthdate">
+      </label>
+    </section>
+
+    <section class="card">
+      <h3>Context</h3>
+
+      <label>Your biggest challenge
+        <textarea id="challenge" rows="3"></textarea>
+      </label>
+
+      <label>Your current goal
+        <textarea id="goal" rows="3"></textarea>
+      </label>
+    </section>
+
+    <section class="card">
+      <h3>Avatar</h3>
+      <div class="avatar-row">
+        <div id="avatar-preview" class="avatar-preview">⟳</div>
+        <label class="file-label">
+          Upload Avatar
+          <input type="file" id="avatar-file" accept="image/*">
+        </label>
+      </div>
+    </section>
+
+    <button id="save-profile" class="primary-btn">Save & Recalculate</button>
+  </main>
+</body>
+</html>
