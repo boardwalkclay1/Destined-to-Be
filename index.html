@@ -5,14 +5,15 @@
   <title>Destined to Be – Numerology Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- App styles -->
   <link rel="stylesheet" href="styles.css">
 
-  <!-- Socket.IO client (no integrity to avoid hash mismatch issues) -->
+  <!-- Socket.IO client (optional, for live sync) -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="app">
-    <!-- Auth -->
+    <!-- ================= AUTH SCREEN ================= -->
     <section id="screen-auth" class="screen">
       <div class="auth-card">
         <h1>Destined to Be</h1>
@@ -23,42 +24,55 @@
           <button id="btn-show-signup" class="tab">Sign up</button>
         </div>
 
-        <form id="form-login" class="auth-form">
+        <!-- Login -->
+        <form id="form-login" class="auth-form" autocomplete="on">
           <label>Username
-            <input type="text" id="login-username" autocomplete="username">
+            <input type="text" id="login-username" autocomplete="username" required>
           </label>
           <label>PIN / Password
-            <input type="password" id="login-password" autocomplete="current-password">
+            <input type="password" id="login-password" autocomplete="current-password" required>
           </label>
           <button type="submit" class="primary">Enter</button>
-          <p class="auth-note">Free tier: core numbers, daily tip, and Spirit Guide basics.</p>
+          <p class="auth-note">
+            Free tier: core numbers, daily tip, and Spirit Guide basics.
+          </p>
           <p id="login-error" class="error"></p>
         </form>
 
-        <form id="form-signup" class="auth-form hidden">
+        <!-- Signup -->
+        <form id="form-signup" class="auth-form hidden" autocomplete="on">
           <label>Username
-            <input type="text" id="signup-username" autocomplete="username">
+            <input type="text" id="signup-username" autocomplete="username" required>
           </label>
           <label>PIN / Password
-            <input type="password" id="signup-password" autocomplete="new-password">
+            <input type="password" id="signup-password" autocomplete="new-password" required>
           </label>
           <button type="submit" class="primary">Create account</button>
-          <p class="auth-note">Stored on this device and synced live via Socket.IO.</p>
+          <p class="auth-note">
+            Stored on this device and optionally synced live via Socket.IO.
+          </p>
           <p id="signup-error" class="error"></p>
         </form>
       </div>
     </section>
 
-    <!-- Main app -->
+    <!-- ================= MAIN APP ================= -->
     <section id="screen-main" class="screen hidden">
+      <!-- Topbar -->
       <header class="topbar">
         <div class="topbar-left">
           <h2 id="topbar-title">Dashboard</h2>
-          <span id="topbar-tier-pill" class="tier-pill">Free</span>
+          <span id="topbar-tier-pill" class="tier-pill" data-tier="free">Free</span>
         </div>
-        <button id="btn-open-settings" class="icon-button" title="Settings">⚙</button>
+        <div class="topbar-right">
+          <button id="btn-open-upgrade" class="pill-upgrade" title="Upgrade to Pro">
+            Unlock Pro – $6
+          </button>
+          <button id="btn-open-settings" class="icon-button" title="Settings">⚙</button>
+        </div>
       </header>
 
+      <!-- Nav -->
       <nav class="nav">
         <button data-route="dashboard" class="nav-btn active">Dashboard</button>
         <button data-route="profile" class="nav-btn">Profile</button>
@@ -68,29 +82,44 @@
         <button data-route="learn" class="nav-btn">Learn</button>
       </nav>
 
+      <!-- Content -->
       <main class="content">
-        <!-- Dashboard -->
-        <section id="view-dashboard" class="view active">
+        <!-- ========== DASHBOARD VIEW ========== -->
+        <section id="view-dashboard" class="view active" data-view="dashboard">
           <h3>Welcome back</h3>
 
-          <div id="dashboard-profile" class="card profile-card"></div>
+          <div id="dashboard-profile" class="card profile-card">
+            <!-- Filled by dashboard/profile-card.js -->
+          </div>
 
-          <div id="dashboard-life-path" class="card"></div>
-          <div id="dashboard-daily-tip" class="card"></div>
+          <div id="dashboard-life-path" class="card">
+            <!-- Filled by dashboard/life-path.js -->
+          </div>
+
+          <div id="dashboard-daily-tip" class="card">
+            <!-- Filled by dashboard/daily-tip.js -->
+          </div>
 
           <div class="card">
             <h4>Quick actions</h4>
             <div class="quick-actions">
-              <button id="btn-dash-complete-profile" class="secondary">Complete profile</button>
-              <button id="btn-dash-see-numbers" class="secondary">See my numbers</button>
-              <button id="btn-dash-open-spirit" class="primary">Ask the Spirit Guide</button>
+              <button id="btn-dash-complete-profile" class="secondary">
+                Complete profile
+              </button>
+              <button id="btn-dash-see-numbers" class="secondary">
+                See my numbers
+              </button>
+              <button id="btn-dash-open-spirit" class="primary">
+                Ask the Spirit Guide
+              </button>
             </div>
           </div>
         </section>
 
-        <!-- Profile -->
-        <section id="view-profile" class="view">
+        <!-- ========== PROFILE VIEW ========== -->
+        <section id="view-profile" class="view" data-view="profile">
           <h3>My profile</h3>
+
           <div class="card">
             <h4>Identity</h4>
             <label>Full birth name (as on birth record)
@@ -128,29 +157,74 @@
           </div>
 
           <div class="card">
-            <button id="btn-save-profile-view" class="primary">Save profile & recalc numbers</button>
+            <button id="btn-save-profile-view" class="primary">
+              Save profile &amp; recalc numbers
+            </button>
           </div>
         </section>
 
-        <!-- Numbers -->
-        <section id="view-numbers" class="view">
+        <!-- ========== NUMBERS VIEW ========== -->
+        <section id="view-numbers" class="view" data-view="numbers">
           <h3>My numbers</h3>
 
+          <!-- Core path -->
           <div class="card">
             <h4>Core path</h4>
-            <div id="numbers-core-path"></div>
+            <div id="numbers-core-path">
+              <!-- Life Path, Birthday, Attitude -->
+            </div>
           </div>
 
+          <!-- Name-based numbers -->
           <div class="card">
             <h4>Name-based numbers</h4>
-            <div id="numbers-name-based"></div>
+            <div id="numbers-name-based">
+              <!-- Expression, Soul Urge, Personality, Maturity, Hidden Passion, Balance, Subconscious, Cornerstone, Capstone, First Vowel -->
+            </div>
           </div>
 
+          <!-- Life phases & lessons -->
           <div class="card">
-            <h4>Life phases & lessons</h4>
-            <div id="numbers-phases"></div>
+            <h4>Life phases &amp; lessons</h4>
+            <div id="numbers-phases">
+              <!-- Cycles, Pinnacles, Challenges, Karmic Lessons, Karmic Debt -->
+            </div>
           </div>
 
+          <!-- Planes & intensity -->
+          <div class="card pro-only" data-lock="pro">
+            <div class="lock-overlay">
+              <p>Planes of expression and intensity chart unlock with Pro.</p>
+              <button class="primary small-btn btn-upgrade-inline">Unlock Pro – $6</button>
+            </div>
+            <div id="numbers-planes-intensity" class="hidden">
+              <!-- Planes of expression, Intensity chart -->
+            </div>
+          </div>
+
+          <!-- Personal cycles -->
+          <div class="card pro-only" data-lock="pro">
+            <div class="lock-overlay">
+              <p>Personal year, month, and day unlock with Pro.</p>
+              <button class="primary small-btn btn-upgrade-inline">Unlock Pro – $6</button>
+            </div>
+            <div id="numbers-personal-cycles" class="hidden">
+              <!-- Personal year, month, day -->
+            </div>
+          </div>
+
+          <!-- Applied numerology -->
+          <div class="card pro-only" data-lock="pro">
+            <div class="lock-overlay">
+              <p>Address, business, and project name numerology unlock with Pro.</p>
+              <button class="primary small-btn btn-upgrade-inline">Unlock Pro – $6</button>
+            </div>
+            <div id="numbers-applied" class="hidden">
+              <!-- Address, business name, project name -->
+            </div>
+          </div>
+
+          <!-- Number you keep seeing -->
           <div class="card">
             <h4>Number you keep seeing</h4>
             <label>Enter a number
@@ -161,29 +235,44 @@
           </div>
         </section>
 
-        <!-- Readings -->
-        <section id="view-readings" class="view">
+        <!-- ========== READINGS VIEW ========== -->
+        <section id="view-readings" class="view" data-view="readings">
           <h3>Readings</h3>
 
+          <!-- Free reading -->
           <div class="card">
-            <h4>Free reading: life path focus</h4>
-            <div id="reading-life-path"></div>
+            <h4>Free reading: Life Path focus</h4>
+            <div id="reading-life-path">
+              <!-- Generated by readings/free-life-path.js -->
+            </div>
           </div>
 
-          <div class="card locked" id="card-advanced-readings">
+          <!-- Advanced readings (Pro) -->
+          <div class="card locked" id="card-advanced-readings" data-lock="pro">
             <div class="lock-overlay">
-              <p>Advanced readings unlock destiny, soul, personality, karmic lessons, and more context.</p>
-              <button id="btn-upgrade-readings" class="primary small-btn">Unlock Pro readings</button>
+              <p>
+                Advanced readings unlock destiny, soul, personality, karmic lessons, cycles,
+                pinnacles, challenges, and your full roadmap.
+              </p>
+              <button id="btn-upgrade-readings" class="primary small-btn">
+                Unlock Pro readings – $6
+              </button>
             </div>
-            <div id="reading-advanced" class="hidden"></div>
+            <div id="reading-advanced" class="hidden">
+              <!-- readings/library.js will render a list of advanced readings here -->
+            </div>
           </div>
         </section>
 
-        <!-- Spirit Guide -->
-        <section id="view-spirit" class="view">
+        <!-- ========== SPIRIT GUIDE VIEW ========== -->
+        <section id="view-spirit" class="view" data-view="spirit">
           <h3>Spirit Guide</h3>
           <div class="card">
-            <p>Your Spirit Guide explains your map, shows you where to tap next, and translates everything into plain language.</p>
+            <p>
+              Your Spirit Guide explains your map, shows you where to tap next,
+              and translates everything into plain language.
+            </p>
+
             <label>What do you want support with right now?
               <select id="spirit-focus">
                 <option value="tour">Show me how to use this app</option>
@@ -193,85 +282,127 @@
                 <option value="path">What is my bigger path?</option>
               </select>
             </label>
-            <label>Optional: ask Spirit a specific question
-              <input type="text" id="spirit-question" placeholder="Type a question for Spirit">
-            </label>
-            <button id="btn-spirit-generate" class="primary small-btn">Ask the Spirit Guide</button>
-            <button id="btn-spirit-speak" class="secondary small-btn">Let Spirit speak out loud</button>
-          </div>
 
-          <div id="spirit-output" class="card"></div>
+            <div id="spirit-extra-inputs">
+              <!-- decision options, dates, etc. injected dynamically -->
+            </div>
+
+            <button id="btn-spirit-ask" class="primary">
+              Ask the Spirit Guide
+            </button>
+
+            <div id="spirit-response" class="spirit-response">
+              <!-- guide-engine.js will render multi-step guidance here -->
+            </div>
+
+            <div id="spirit-upgrade-hint" class="tip pro-hint hidden">
+              Deeper Spirit Guide modes unlock with Pro: full destiny map, personal year roadmap,
+              karmic lessons, and more.
+            </div>
+          </div>
         </section>
 
-        <!-- Learn -->
-        <section id="view-learn" class="view">
-          <h3>Learn the numbers</h3>
+        <!-- ========== LEARN VIEW ========== -->
+        <section id="view-learn" class="view" data-view="learn">
+          <h3>Learn numerology</h3>
+
           <div class="card">
-            <h4>Core map</h4>
-            <ul class="learn-list">
-              <li><strong>Life Path:</strong> your main road, from birthdate.</li>
-              <li><strong>Destiny (Expression):</strong> what you are wired to build, from full name.</li>
-              <li><strong>Soul Urge:</strong> what your heart quietly craves, from vowels in your name.</li>
-              <li><strong>Personality:</strong> how others first read you, from consonants.</li>
-              <li><strong>Birthday number:</strong> the flavor added by the day of the month you were born.</li>
-              <li><strong>Maturity:</strong> what you grow into later in life (life path + destiny).</li>
-              <li><strong>Karmic lessons:</strong> numbers missing from your name, showing themes you keep practicing.</li>
-              <li><strong>Balance:</strong> how you tend to respond emotionally when conflict hits.</li>
-            </ul>
+            <h4>Core numbers</h4>
+            <div id="learn-core">
+              <!-- Static + dynamic content explaining Life Path, Expression, Soul, Personality, etc. -->
+            </div>
           </div>
 
           <div class="card">
-            <h4>How to get the best reading here</h4>
-            <ol class="learn-list">
-              <li>Fill out your Profile with full birth name and accurate birthdate.</li>
-              <li>Save it so the app can calculate all your core numbers.</li>
-              <li>Visit “Numbers” to see the full map.</li>
-              <li>Open “Readings” and unlock Pro if you want deeper interpretation.</li>
-              <li>Talk to the Spirit Guide when you feel confused or stuck.</li>
-            </ol>
+            <h4>Cycles &amp; phases</h4>
+            <div id="learn-cycles">
+              <!-- Explanation of cycles, pinnacles, challenges, personal year/month/day -->
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Karmic &amp; master numbers</h4>
+            <div id="learn-karmic">
+              <!-- Karmic debt, karmic lessons, master numbers, shadow -->
+            </div>
+          </div>
+
+          <div class="card">
+            <h4>Applied numerology</h4>
+            <div id="learn-applied">
+              <!-- Address, business names, project names, dates -->
+            </div>
           </div>
         </section>
       </main>
     </section>
 
-    <!-- Settings modal -->
-    <div id="modal-settings" class="modal hidden">
+    <!-- ================= UPGRADE / PAYWALL MODAL ================= -->
+    <div id="modal-upgrade" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop"></div>
       <div class="modal-content">
-        <header class="modal-header">
-          <h3>Settings & access</h3>
-          <button id="btn-close-settings" class="icon-button">✕</button>
-        </header>
-        <div class="modal-body">
-          <section class="card">
-            <h4>Theme</h4>
-            <label>
-              Theme
-              <select id="settings-theme">
-                <option value="midnight">Midnight (black, red, midnight blue)</option>
-                <option value="light">Starlight (white, soft red)</option>
-              </select>
-            </label>
-          </section>
+        <button id="btn-close-upgrade" class="icon-button modal-close" aria-label="Close">✕</button>
+        <h3>Unlock Destined to Be Pro</h3>
+        <p>
+          One-time payment of <strong>$6</strong> unlocks:
+        </p>
+        <ul class="upgrade-list">
+          <li>All advanced numerology calculations and readings</li>
+          <li>Full Spirit Guide intelligence and destiny roadmap</li>
+          <li>Personal year, month, and day guidance</li>
+          <li>Karmic lessons, pinnacles, challenges, and more</li>
+        </ul>
 
-          <section class="card">
-            <h4>Access and tiers</h4>
-            <p id="tier-status"></p>
-            <button id="btn-open-paypal-pro" class="secondary small-btn">Upgrade to Pro (PayPal)</button>
-          </section>
-
-          <section class="card danger">
-            <h4>Data</h4>
-            <button id="btn-export-data" class="secondary small-btn">Export data (JSON)</button>
-            <button id="btn-reset-all" class="secondary small-btn">Reset all data on this device</button>
-            <button id="btn-logout" class="secondary small-btn">Log out</button>
-          </section>
+        <div class="upgrade-actions">
+          <!-- Replace href with your real PayPal payment link -->
+          <a id="btn-paypal-link" class="primary" href="YOUR_PAYPAL_LINK_HERE" target="_blank" rel="noopener">
+            Pay $6 via PayPal
+          </a>
+          <button id="btn-confirm-upgrade" class="secondary">
+            I’ve paid – unlock Pro on this device
+          </button>
         </div>
+
+        <p class="upgrade-note">
+          Pro unlock is stored on this device. You can re-unlock on other devices after paying once.
+        </p>
       </div>
     </div>
 
-    <div id="toast" class="toast hidden"></div>
+    <!-- ================= SETTINGS MODAL ================= -->
+    <div id="modal-settings" class="modal hidden" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <button id="btn-close-settings" class="icon-button modal-close" aria-label="Close">✕</button>
+        <h3>Settings</h3>
+
+        <div class="card">
+          <h4>Account</h4>
+          <button id="btn-logout" class="secondary">Log out</button>
+        </div>
+
+        <div class="card">
+          <h4>Tier</h4>
+          <p>Current tier: <span id="settings-tier-label">Free</span></p>
+          <button id="btn-open-upgrade-from-settings" class="primary">
+            Upgrade to Pro – $6
+          </button>
+        </div>
+
+        <div class="card">
+          <h4>Sync</h4>
+          <p>Optional: enable live sync via Socket.IO (if configured).</p>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-sync">
+            <span>Enable live sync</span>
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- ================= MAIN APP SCRIPT ================= -->
+  <!-- app.js will import all modules: router, state, engine, views, spirit, upgrade, etc. -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
