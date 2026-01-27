@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/auth/login.js"></script>
+</head>
+
+<body class="auth-body">
+  <div class="auth-container">
+    <h1>Destined to Be</h1>
+    <p class="subtitle">Welcome back.</p>
+
+    <form id="login-form" class="auth-form">
+      <label>Username
+        <input type="text" id="login-username" autocomplete="username" required>
+      </label>
+
+      <label>PIN / Password
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </label>
+
+      <button type="submit" class="primary-btn">Enter</button>
+      <p id="login-error" class="error"></p>
+    </form>
+
+    <p class="auth-switch">
+      New here? <a href="signup.html">Create an account</a>
+    </p>
+  </div>
+</body>
+</html>
