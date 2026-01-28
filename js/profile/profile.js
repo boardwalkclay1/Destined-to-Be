@@ -1,5 +1,6 @@
 // js/profile/profile.js
 import { getState, updateUser, setNumbers } from '../state.js';
+import { computeAll } from '../engine/index.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const state = getState();
@@ -30,6 +31,7 @@ function wireAvatar() {
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result;
@@ -52,27 +54,17 @@ function wireSave() {
     const challenge = document.getElementById('challenge').value.trim();
     const goal = document.getElementById('goal').value.trim();
 
+    // Save user profile
     updateUser({ fullName, preferredName, birthdate, challenge, goal });
 
-    // Placeholder: here you’d call your numerology engine
-    const numbers = fakeRecalc(fullName, birthdate);
+    // Run full hybrid numerology engine
+    const numbers = computeAll(fullName, birthdate);
+
+    // Save numerology map
     setNumbers(numbers);
 
+    // UI feedback
     btn.textContent = 'Saved ✓';
     setTimeout(() => (btn.textContent = 'Save & Recalculate'), 1200);
   });
-}
-
-function fakeRecalc(fullName, birthdate) {
-  // This is a stub. Replace with real engine.
-  return {
-    lifePath: { value: '7', summary: 'Seeker, analyst, depth.' },
-    birthday: { value: '3' },
-    expression: { value: '1' },
-    soul: { value: '9' },
-    personality: { value: '5' },
-    dailyTip: fullName && birthdate
-      ? 'You updated your map. Pay attention to what feels lighter today.'
-      : 'Complete your profile to unlock deeper guidance.',
-  };
 }
