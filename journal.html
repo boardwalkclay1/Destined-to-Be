@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Journal – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/journal/journal.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Journal</h2>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>New Entry</h3>
+      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts..."></textarea>
+      <button id="save-entry" class="primary-btn">Save Entry</button>
+    </section>
+
+    <section class="card">
+      <h3>Past Entries</h3>
+      <ul id="journal-list"></ul>
+    </section>
+  </main>
+</body>
+</html>
