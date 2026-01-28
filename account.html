@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/state.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Account</h2>
+    <a href="settings.html" class="icon-btn">⚙</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Profile Data</h3>
+      <p>Your numerology profile is stored locally on this device.</p>
+      <button class="secondary-btn" onclick="location.href='backup.html'">Backup Data</button>
+      <button class="secondary-btn" onclick="location.href='restore.html'">Restore Data</button>
+    </section>
+
+    <section class="card">
+      <h3>Danger Zone</h3>
+      <button id="delete-account" class="danger-btn">Delete All Data</button>
+    </section>
+  </main>
+</body>
+</html>
