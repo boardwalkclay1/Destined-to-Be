@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pattern Tracker – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/patterns/tracker.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Pattern Tracker</h2>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Log a Pattern</h3>
+      <input type="text" id="pattern-number" placeholder="111, 222, 1234...">
+      <textarea id="pattern-notes" rows="3" placeholder="Context or meaning..."></textarea>
+      <button id="save-pattern" class="primary-btn">Save</button>
+    </section>
+
+    <section class="card">
+      <h3>History</h3>
+      <ul id="pattern-history"></ul>
+    </section>
+  </main>
+</body>
+</html>
