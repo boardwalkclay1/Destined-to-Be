@@ -1,43 +1,123 @@
-// js/dashboard/dashboard.js
-import { getState } from '../state.js';
-import { applyTierToDom } from '../tier.js';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-window.addEventListener('DOMContentLoaded', () => {
-  applyTierToDom();
-  hydrateTierPill();
-  wireNav();
-  hydrateQuickContext();
-});
+  <!-- adjust if your CSS is in styles/styles.css -->
+  <link rel="stylesheet" href="styles.css">
 
-function hydrateTierPill() {
-  const state = getState();
-  const pill = document.getElementById('tier-pill');
-  if (!pill) return;
-  pill.textContent = state.tier === 'pro' ? 'Pro' : 'Free';
-}
+  <!-- only the dashboard script; it will import what it needs -->
+  <script type="module" src="js/dashboard/dashboard.js"></script>
+</head>
 
-function wireNav() {
-  document.querySelectorAll('[data-nav]').forEach(el => {
-    el.addEventListener('click', () => {
-      const target = el.getAttribute('data-nav');
-      if (target) window.location.href = target;
-    });
-  });
-}
+<body class="app-body">
 
-function hydrateQuickContext() {
-  // Optional: you can surface a tiny bit of state here later
-  // (e.g., show name or life path in the topbar subtitle)
-  const state = getState();
-  const sub = document.querySelector('.topbar-left .subhead');
-  if (!sub) return;
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <h2>Destined to Be</h2>
+      <span class="subhead">Numerology OS Dashboard</span>
+    </div>
 
-  const name = state.user?.preferredName || state.user?.fullName;
-  const lp = state.numbers?.lifePath?.value;
+    <div class="topbar-right">
+      <span id="tier-pill" class="tier-pill">Free</span>
+      <button data-nav="settings.html" class="icon-btn" title="Settings">⚙</button>
+    </div>
+  </header>
 
-  if (name && lp) {
-    sub.textContent = `${name} • Life Path ${lp}`;
-  } else if (name) {
-    sub.textContent = `${name} • Dashboard`;
-  }
-}
+  <!-- MAIN CONTENT -->
+  <main class="content dashboard-grid">
+
+    <!-- CORE -->
+    <section class="card">
+      <h3>Core</h3>
+      <div class="link-grid">
+        <button data-nav="profile.html" class="secondary-btn">Profile</button>
+        <button data-nav="number.html" class="secondary-btn">My Numbers</button>
+        <button data-nav="spirit.html" class="primary-btn">Spirit Guide</button>
+        <button data-nav="daily_energy.html" class="secondary-btn">Daily Energy</button>
+        <button data-nav="compatibility.html" class="secondary-btn">Compatibility</button>
+        <button data-nav="vibration-tools.html" class="secondary-btn">Vibration Tools</button>
+      </div>
+    </section>
+
+    <!-- GROWTH -->
+    <section class="card">
+      <h3>Growth & Tracking</h3>
+      <div class="link-grid">
+        <button data-nav="journal.html" class="secondary-btn">Journal</button>
+        <button data-nav="pattern-tracker.html" class="secondary-btn">Pattern Tracker</button>
+        <button data-nav="cycles-calendar.html" class="secondary-btn">Cycles Calendar</button>
+        <button data-nav="reading.html" class="secondary-btn">Readings</button>
+        <button data-nav="meanings.html" class="secondary-btn">Meanings Library</button>
+        <button data-nav="learn.html" class="secondary-btn">Learn</button>
+      </div>
+    </section>
+
+    <!-- SYSTEM -->
+    <section class="card">
+      <h3>System & Account</h3>
+      <div class="link-grid">
+        <button data-nav="account.html" class="secondary-btn">Account</button>
+        <button data-nav="backup.html" class="secondary-btn">Backup</button>
+        <button data-nav="restore.html" class="secondary-btn">Restore</button>
+        <button data-nav="sync.html" class="secondary-btn">Sync</button>
+        <button data-nav="upgrade.html" class="primary-btn">Upgrade</button>
+        <button data-nav="system-status.html" class="secondary-btn">System Status</button>
+      </div>
+    </section>
+
+    <!-- RESEARCH / DATA -->
+    <section class="card">
+      <h3>Research & Data</h3>
+      <div class="link-grid">
+        <button data-nav="research.html" class="secondary-btn">Research Lab</button>
+        <button data-nav="data-viewer.html" class="secondary-btn">Data Viewer</button>
+        <button data-nav="scarper.html" class="secondary-btn">Scraper</button>
+        <button data-nav="docs.html" class="secondary-btn">Docs</button>
+        <button data-nav="modules.html" class="secondary-btn">Modules Map</button>
+        <button data-nav="template-preview.html" class="secondary-btn">Template Preview</button>
+      </div>
+    </section>
+
+    <!-- ENGINE / DEV -->
+    <section class="card">
+      <h3>Engine & Dev Tools</h3>
+      <div class="link-grid">
+        <button data-nav="engine-test.html" class="secondary-btn">Engine Test</button>
+        <button data-nav="engine-map.html" class="secondary-btn">Engine Map</button>
+        <button data-nav="engine-benchmark.html" class="secondary-btn">Engine Benchmark</button>
+        <button data-nav="ui-preview.html" class="secondary-btn">UI Preview</button>
+        <button data-nav="dev-tools.html" class="secondary-btn">Dev Tools</button>
+        <button data-nav="tempaltes.html" class="secondary-btn">Templates (Raw)</button>
+      </div>
+    </section>
+
+    <!-- META / SUPPORT -->
+    <section class="card">
+      <h3>Meta & Support</h3>
+      <div class="link-grid">
+        <button data-nav="about.html" class="secondary-btn">About</button>
+        <button data-nav="support.html" class="secondary-btn">Support</button>
+        <button data-nav="feedback.html" class="secondary-btn">Feedback</button>
+        <button data-nav="changelog.html" class="secondary-btn">Changelog</button>
+        <button data-nav="privacy.html" class="secondary-btn">Privacy</button>
+        <button data-nav="terms.html" class="secondary-btn">Terms</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-nav">
+    <button data-nav="dashboard.html">Dashboard</button>
+    <button data-nav="profile.html">Profile</button>
+    <button data-nav="number.html">Numbers</button>
+    <button data-nav="spirit.html">Spirit</button>
+    <button data-nav="settings.html">Settings</button>
+  </footer>
+
+</body>
+</html>
