@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compatibility – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/compatibility/compatibility.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Compatibility</h2>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Person A</h3>
+      <input type="text" id="name-a" placeholder="Full name">
+      <input type="date" id="birth-a">
+    </section>
+
+    <section class="card">
+      <h3>Person B</h3>
+      <input type="text" id="name-b" placeholder="Full name">
+      <input type="date" id="birth-b">
+    </section>
+
+    <button id="run-compatibility" class="primary-btn">Analyze Compatibility</button>
+
+    <section class="card">
+      <h3>Results</h3>
+      <pre id="compatibility-output"></pre>
+    </section>
+  </main>
+</body>
+</html>
