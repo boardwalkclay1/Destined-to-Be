@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Viewer – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/dev/data-viewer.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Data Viewer</h2>
+    <a href="dev-tools.html" class="icon-btn">🛠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Select Data Source</h3>
+      <select id="data-source">
+        <option value="profile">User Profile</option>
+        <option value="numbers">Computed Numbers</option>
+        <option value="meanings">Meanings Database</option>
+        <option value="templates">Reading Templates</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h3>Data</h3>
+      <pre id="data-output"></pre>
+    </section>
+  </main>
+</body>
+</html>
