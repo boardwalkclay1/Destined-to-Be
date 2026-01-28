@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Engine Test – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/dev/engine-test.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Engine Test</h2>
+    <a href="dev-tools.html" class="icon-btn">🛠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Input</h3>
+      <label>Full Name
+        <input type="text" id="test-name">
+      </label>
+
+      <label>Birthdate
+        <input type="date" id="test-birthdate">
+      </label>
+
+      <button id="run-engine" class="primary-btn">Run Engine</button>
+    </section>
+
+    <section class="card">
+      <h3>Output</h3>
+      <pre id="engine-output"></pre>
+    </section>
+  </main>
+</body>
+</html>
