@@ -5,10 +5,10 @@
   <title>Dashboard – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- adjust if your CSS is in styles/styles.css -->
   <link rel="stylesheet" href="styles.css">
 
-  <script type="module" src="js/state.js"></script>
-  <script type="module" src="js/tier.js"></script>
+  <!-- only the dashboard script; it will import what it needs -->
   <script type="module" src="js/dashboard/dashboard.js"></script>
 </head>
 
@@ -23,7 +23,7 @@
 
     <div class="topbar-right">
       <span id="tier-pill" class="tier-pill">Free</span>
-      <a href="settings.html" class="icon-btn" title="Settings">⚙</a>
+      <button data-nav="settings.html" class="icon-btn" title="Settings">⚙</button>
     </div>
   </header>
 
