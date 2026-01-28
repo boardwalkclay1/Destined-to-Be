@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sync – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/sync/sync.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Sync</h2>
+    <a href="settings.html" class="icon-btn">⚙</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Live Sync</h3>
+      <p>Enable optional real-time sync using Socket.IO.</p>
+
+      <label class="toggle">
+        <input type="checkbox" id="sync-enable">
+        <span>Enable Sync</span>
+      </label>
+
+      <label>Server URL
+        <input type="text" id="sync-server" placeholder="https://your-sync-server.com">
+      </label>
+
+      <button id="save-sync" class="primary-btn">Save</button>
+    </section>
+  </main>
+</body>
+</html>
