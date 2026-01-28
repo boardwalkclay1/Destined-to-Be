@@ -2,57 +2,127 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Numbers – Destined to Be</title>
+  <title>My Numbers – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="styles/styles.css">
 
+  <!-- Core state + tier -->
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/tier.js"></script>
+
+  <!-- Numbers page controller -->
   <script type="module" src="js/numbers/numbers.js"></script>
 
-  <!-- Numerology engine -->
-  <script type="module" src="js/engine/life-path.js"></script>
-  <script type="module" src="js/engine/birthday.js"></script>
-  <script type="module" src="js/engine/expression.js"></script>
-  <script type="module" src="js/engine/soul.js"></script>
-  <script type="module" src="js/engine/personality.js"></script>
-  <script type="module" src="js/engine/maturity.js"></script>
-  <script type="module" src="js/engine/karmic-lessons.js"></script>
-  <script type="module" src="js/engine/karmic-debt.js"></script>
-  <script type="module" src="js/engine/pinnacles.js"></script>
-  <script type="module" src="js/engine/challenges.js"></script>
-  <script type="module" src="js/engine/cycles.js"></script>
-  <script type="module" src="js/engine/personal-year.js"></script>
-  <script type="module" src="js/engine/personal-month.js"></script>
-  <script type="module" src="js/engine/personal-day.js"></script>
-  <script type="module" src="js/engine/planes.js"></script>
-  <script type="module" src="js/engine/intensity.js"></script>
-  <script type="module" src="js/engine/shadow.js"></script>
-  <script type="module" src="js/engine/repeating.js"></script>
+  <!-- Full engine aggregator -->
+  <script type="module" src="js/engine/index.js"></script>
 </head>
 
 <body class="app-body">
+
+  <!-- TOPBAR -->
   <header class="topbar">
-    <h2>My Numbers</h2>
-    <a href="settings.html" class="icon-btn">⚙</a>
+    <div class="topbar-left">
+      <a href="dashboard.html" class="icon-btn" title="Back">←</a>
+      <h2>My Numbers</h2>
+    </div>
+
+    <div class="topbar-right">
+      <span id="tier-pill" class="tier-pill">Free</span>
+      <a href="settings.html" class="icon-btn" title="Settings">⚙</a>
+    </div>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="content">
-    <section class="card" id="core-numbers"></section>
-    <section class="card" id="name-numbers"></section>
-    <section class="card" id="phases"></section>
 
-    <section class="card pro-only" id="planes-intensity"></section>
-    <section class="card pro-only" id="personal-cycles"></section>
-    <section class="card pro-only" id="applied"></section>
+    <!-- CORE NUMBERS -->
+    <section class="card expandable" data-section="core">
+      <div class="card-header">
+        <h3>Core Path Numbers</h3>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="core-numbers"></div>
+    </section>
 
+    <!-- NAME NUMBERS -->
+    <section class="card expandable" data-section="name">
+      <div class="card-header">
+        <h3>Name-Based Numbers</h3>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="name-numbers"></div>
+    </section>
+
+    <!-- PHASES -->
+    <section class="card expandable" data-section="phases">
+      <div class="card-header">
+        <h3>Life Phases & Lessons</h3>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="phases"></div>
+    </section>
+
+    <!-- PRO: PLANES + INTENSITY -->
+    <section class="card expandable pro-only" data-section="planes">
+      <div class="card-header">
+        <h3>Planes & Intensity</h3>
+        <span class="lock-icon">🔒</span>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="planes-intensity"></div>
+    </section>
+
+    <!-- PRO: PERSONAL CYCLES -->
+    <section class="card expandable pro-only" data-section="cycles">
+      <div class="card-header">
+        <h3>Personal Cycles</h3>
+        <span class="lock-icon">🔒</span>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="personal-cycles"></div>
+    </section>
+
+    <!-- PRO: APPLIED NUMEROLOGY -->
+    <section class="card expandable pro-only" data-section="applied">
+      <div class="card-header">
+        <h3>Applied Numerology</h3>
+        <span class="lock-icon">🔒</span>
+        <button class="expand-btn">▼</button>
+      </div>
+      <div class="card-body" id="applied"></div>
+    </section>
+
+    <!-- REPEATING NUMBERS -->
     <section class="card">
       <h3>Number You Keep Seeing</h3>
-      <input type="text" id="seen-number" placeholder="111, 222, 1234...">
-      <button id="interpret-number" class="primary-btn">Interpret</button>
-      <div id="seen-result"></div>
+      <div class="seen-grid">
+        <input type="text" id="seen-number" placeholder="111, 222, 1234...">
+        <button id="interpret-number" class="primary-btn">Interpret</button>
+      </div>
+      <div id="seen-result" class="seen-output"></div>
     </section>
+
   </main>
+
+  <!-- EXPANDABLE SECTION SCRIPT -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.expandable').forEach(section => {
+        const btn = section.querySelector('.expand-btn');
+        const body = section.querySelector('.card-body');
+
+        btn.addEventListener('click', () => {
+          section.classList.toggle('open');
+          body.style.display = section.classList.contains('open') ? 'block' : 'none';
+          btn.textContent = section.classList.contains('open') ? '▲' : '▼';
+        });
+
+        // Start collapsed
+        body.style.display = 'none';
+      });
+    });
+  </script>
+
 </body>
 </html>
