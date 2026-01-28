@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <script type="module" src="js/state.js"></script>
+  <script type="module" src="js/settings/settings.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Settings</h2>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Account</h3>
+      <button id="logout" class="secondary-btn">Log Out</button>
+    </section>
+
+    <section class="card">
+      <h3>Tier</h3>
+      <p>Current tier: <span id="tier-label">Free</span></p>
+      <a href="upgrade.html" class="primary-btn">Upgrade to Pro – $6</a>
+    </section>
+
+    <section class="card">
+      <h3>Sync</h3>
+      <label class="toggle">
+        <input type="checkbox" id="sync-toggle">
+        <span>Enable live sync (Socket.IO)</span>
+      </label>
+    </section>
+  </main>
+</body>
+</html>
