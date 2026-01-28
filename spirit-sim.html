@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spirit Guide Simulator – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/spirit/spirit-sim.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Spirit Guide Simulator</h2>
+    <a href="dev-tools.html" class="icon-btn">🛠</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Mode</h3>
+      <select id="sim-mode">
+        <option value="tour">Tour</option>
+        <option value="numbers">Explain Numbers</option>
+        <option value="decision">Decision Help</option>
+        <option value="stuck">Stuck</option>
+        <option value="path">Path</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h3>Output</h3>
+      <pre id="sim-output"></pre>
+    </section>
+  </main>
+</body>
+</html>
