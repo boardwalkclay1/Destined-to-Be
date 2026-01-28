@@ -13,27 +13,49 @@
 </head>
 
 <body class="app-body">
+
+  <!-- TOPBAR -->
   <header class="topbar">
-    <h2>Dashboard</h2>
+    <div class="topbar-left">
+      <a href="index.html" class="icon-btn" title="Back">←</a>
+      <h2>Dashboard</h2>
+    </div>
+
     <div class="topbar-right">
       <span id="tier-pill" class="tier-pill">Free</span>
-      <a href="settings.html" class="icon-btn">⚙</a>
+      <a href="settings.html" class="icon-btn" title="Settings">⚙</a>
     </div>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="content">
-    <section class="card" id="profile-card"></section>
-    <section class="card" id="life-path-card"></section>
-    <section class="card" id="daily-tip-card"></section>
 
+    <!-- PROFILE SUMMARY -->
+    <section class="card" id="profile-card">
+      <!-- Filled by dashboard.js -->
+    </section>
+
+    <!-- LIFE PATH -->
+    <section class="card" id="life-path-card">
+      <!-- Filled by dashboard.js -->
+    </section>
+
+    <!-- DAILY TIP -->
+    <section class="card" id="daily-tip-card">
+      <!-- Filled by dashboard.js -->
+    </section>
+
+    <!-- QUICK ACTIONS -->
     <section class="card">
       <h3>Quick Actions</h3>
       <div class="quick-actions">
-        <a href="profile.html" class="secondary-btn">Complete Profile</a>
-        <a href="numbers.html" class="secondary-btn">See My Numbers</a>
+        <a href="profile.html" class="secondary-btn">Edit Profile</a>
+        <a href="numbers.html" class="secondary-btn">View My Numbers</a>
         <a href="spirit.html" class="primary-btn">Ask the Spirit Guide</a>
       </div>
     </section>
+
   </main>
+
 </body>
 </html>
