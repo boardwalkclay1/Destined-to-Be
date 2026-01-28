@@ -1,0 +1,7 @@
+import { dateParts, reduce } from './utils.js';
+
+export function computeBirthday(birthdate) {
+  if (!birthdate) return null;
+  const { day } = dateParts(birthdate);
+  return { value: reduce(day) };
+}
