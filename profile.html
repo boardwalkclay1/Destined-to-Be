@@ -12,21 +12,29 @@
 </head>
 
 <body class="app-body">
+
+  <!-- TOPBAR -->
   <header class="topbar">
-    <h2>Profile</h2>
-    <a href="settings.html" class="icon-btn">⚙</a>
+    <div class="topbar-left">
+      <a href="dashboard.html" class="icon-btn" title="Back">←</a>
+      <h2>Profile</h2>
+    </div>
+    <a href="settings.html" class="icon-btn" title="Settings">⚙</a>
   </header>
 
+  <!-- MAIN CONTENT -->
   <main class="content">
+
+    <!-- IDENTITY -->
     <section class="card">
       <h3>Identity</h3>
 
       <label>Full Birth Name
-        <input type="text" id="full-name">
+        <input type="text" id="full-name" placeholder="Your full legal birth name">
       </label>
 
       <label>Preferred Name
-        <input type="text" id="preferred-name">
+        <input type="text" id="preferred-name" placeholder="What you go by">
       </label>
 
       <label>Birthdate
@@ -34,18 +42,20 @@
       </label>
     </section>
 
+    <!-- CONTEXT -->
     <section class="card">
-      <h3>Context</h3>
+      <h3>Your Story</h3>
 
       <label>Your biggest challenge
-        <textarea id="challenge" rows="3"></textarea>
+        <textarea id="challenge" rows="3" placeholder="What feels heavy right now?"></textarea>
       </label>
 
       <label>Your current goal
-        <textarea id="goal" rows="3"></textarea>
+        <textarea id="goal" rows="3" placeholder="What are you moving toward?"></textarea>
       </label>
     </section>
 
+    <!-- AVATAR -->
     <section class="card">
       <h3>Avatar</h3>
       <div class="avatar-row">
@@ -57,7 +67,10 @@
       </div>
     </section>
 
+    <!-- SAVE BUTTON -->
     <button id="save-profile" class="primary-btn">Save & Recalculate</button>
+
   </main>
+
 </body>
 </html>
