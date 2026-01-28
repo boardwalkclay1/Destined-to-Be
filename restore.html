@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Restore – Destined to Be</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/styles.css">
+  <script type="module" src="js/backup/restore.js"></script>
+</head>
+
+<body class="app-body">
+  <header class="topbar">
+    <h2>Restore Data</h2>
+    <a href="account.html" class="icon-btn">←</a>
+  </header>
+
+  <main class="content">
+    <section class="card">
+      <h3>Import Backup</h3>
+      <p>Select a previously exported JSON file to restore your numerology data.</p>
+
+      <label class="file-label">
+        Choose File
+        <input type="file" id="restore-file" accept="application/json">
+      </label>
+
+      <button id="restore-btn" class="primary-btn">Restore</button>
+    </section>
+  </main>
+</body>
+</html>
