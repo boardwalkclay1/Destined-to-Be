@@ -18,12 +18,18 @@
   <main class="content">
     <section class="card">
       <h3>Meaning Keys</h3>
+      <p class="tip">Click a key to load or create a new one below.</p>
       <ul id="meaning-keys"></ul>
     </section>
 
     <section class="card">
       <h3>Meaning Editor</h3>
-      <textarea id="meaning-editor" rows="20"></textarea>
+
+      <label for="meaning-key-input">Key</label>
+      <input id="meaning-key-input" type="text" placeholder="e.g. life_path_1, destiny_7">
+
+      <textarea id="meaning-editor" rows="16" placeholder="Write or edit the meaning for this key..."></textarea>
+
       <button id="save-meaning" class="primary-btn">Save Meaning</button>
     </section>
   </main>
