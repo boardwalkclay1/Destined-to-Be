@@ -77,21 +77,3 @@
 
 </body>
 </html>
-    // Optional: cosmic date injection
-    const el = document.getElementById('cosmic-date');
-    if (el) {
-      const now = new Date();
-      const day = now.getDate();
-      const month = now.getMonth() + 1;
-      const year = now.getFullYear();
-      const sum = (day + month + year)
-        .toString()
-        .split('')
-        .reduce((a, b) => a + Number(b), 0);
-
-      el.textContent = `Universal Number: ${sum}`;
-    }
-  </script>
-
-</body>
-</html>
