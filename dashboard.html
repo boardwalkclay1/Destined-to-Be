@@ -15,94 +15,52 @@
   <header class="topbar">
     <div class="topbar-left">
       <h2>Destined to Be</h2>
-      <span class="subhead">Numerology Dashboard</span>
-      <span class="cosmic-date" id="cosmic-date"></span>
+      <span class="subhead">Dashboard</span>
     </div>
 
     <div class="topbar-right">
       <span id="tier-pill" class="tier-pill">Free</span>
-      <button data-nav="settings.html" class="icon-btn" title="Settings">⚙</button>
+      <button data-nav="settings.html" class="icon-btn">⚙</button>
     </div>
   </header>
 
   <!-- MAIN CONTENT -->
   <main class="content dashboard-grid">
 
-    <!-- CORE -->
+    <!-- READINGS -->
     <section class="card">
-      <h3>Core</h3>
+      <h3>Readings</h3>
       <div class="link-grid">
-        <button data-nav="profile.html" class="secondary-btn">Profile</button>
         <button data-nav="number.html" class="secondary-btn">My Numbers</button>
         <button data-nav="spirit.html" class="primary-btn">Spirit Guide</button>
         <button data-nav="daily_energy.html" class="secondary-btn">Daily Energy</button>
         <button data-nav="compatibility.html" class="secondary-btn">Compatibility</button>
-        <button data-nav="vibration-tools.html" class="secondary-btn">Vibration Tools</button>
+        <button data-nav="meanings.html" class="secondary-btn">Meanings</button>
+        <button data-nav="reading.html" class="secondary-btn">Full Readings</button>
       </div>
     </section>
 
-    <!-- GROWTH -->
+    <!-- TOOLS -->
     <section class="card">
-      <h3>Growth</h3>
+      <h3>Tools</h3>
       <div class="link-grid">
         <button data-nav="journal.html" class="secondary-btn">Journal</button>
         <button data-nav="pattern-tracker.html" class="secondary-btn">Patterns</button>
         <button data-nav="cycles-calendar.html" class="secondary-btn">Cycles</button>
-        <button data-nav="reading.html" class="secondary-btn">Readings</button>
-        <button data-nav="meanings.html" class="secondary-btn">Meanings</button>
-        <button data-nav="learn.html" class="secondary-btn">Learn</button>
+        <button data-nav="vibration-tools.html" class="secondary-btn">Vibration Tools</button>
       </div>
     </section>
 
-    <!-- SYSTEM -->
+    <!-- ACCOUNT -->
     <section class="card">
-      <h3>System</h3>
+      <h3>Account</h3>
       <div class="link-grid">
         <button data-nav="account.html" class="secondary-btn">Account</button>
         <button data-nav="backup.html" class="secondary-btn">Backup</button>
         <button data-nav="restore.html" class="secondary-btn">Restore</button>
         <button data-nav="sync.html" class="secondary-btn">Sync</button>
         <button data-nav="upgrade.html" class="primary-btn">Upgrade</button>
-        <button data-nav="system-status.html" class="secondary-btn">Status</button>
-      </div>
-    </section>
-
-    <!-- RESEARCH / DATA -->
-    <section class="card">
-      <h3>Research</h3>
-      <div class="link-grid">
-        <button data-nav="research.html" class="secondary-btn">Lab</button>
-        <button data-nav="data-viewer.html" class="secondary-btn">Data</button>
-        <button data-nav="scarper.html" class="secondary-btn">Scraper</button>
-        <button data-nav="docs.html" class="secondary-btn">Docs</button>
-        <button data-nav="modules.html" class="secondary-btn">Modules</button>
-        <button data-nav="template-preview.html" class="secondary-btn">Templates</button>
-      </div>
-    </section>
-
-    <!-- ENGINE / DEV -->
-    <section class="card">
-      <h3>Dev Tools</h3>
-      <div class="link-grid">
-        <button data-nav="engine-test.html" class="secondary-btn">Engine Test</button>
-        <button data-nav="engine-map.html" class="secondary-btn">Engine Map</button>
-        <button data-nav="engine-benchmark.html" class="secondary-btn">Benchmark</button>
-        <button data-nav="ui-preview.html" class="secondary-btn">UI Preview</button>
-        <button data-nav="dev-tools.html" class="secondary-btn">Dev Tools</button>
-        <button data-nav="tempaltes.html" class="secondary-btn">Raw Templates</button>
-      </div>
-    </section>
-
-    <!-- META / SUPPORT -->
-    <section class="card">
-      <h3>Support</h3>
-      <div class="link-grid">
-        <button data-nav="about.html" class="secondary-btn">About</button>
-        <button data-nav="support.html" class="secondary-btn">Support</button>
-        <button data-nav="feedback.html" class="secondary-btn">Feedback</button>
-        <button data-nav="changelog.html" class="secondary-btn">Changelog</button>
-        <button data-nav="privacy.html" class="secondary-btn">Privacy</button>
-        <button data-nav="terms.html" class="secondary-btn">Terms</button>
+        <button data-nav="settings.html" class="secondary-btn">Settings</button>
       </div>
     </section>
 
@@ -111,13 +69,14 @@
   <!-- FOOTER -->
   <footer class="footer-nav">
     <button data-nav="dashboard.html">Dashboard</button>
-    <button data-nav="profile.html">Profile</button>
     <button data-nav="number.html">Numbers</button>
     <button data-nav="spirit.html">Spirit</button>
+    <button data-nav="reading.html">Readings</button>
     <button data-nav="settings.html">Settings</button>
   </footer>
 
-  <script>
+</body>
+</html>
     // Optional: cosmic date injection
     const el = document.getElementById('cosmic-date');
     if (el) {
