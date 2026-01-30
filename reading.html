@@ -5,7 +5,7 @@
   <title>Readings – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles.css">
 
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/tier.js"></script>
@@ -15,16 +15,66 @@
 <body class="app-body">
   <header class="topbar">
     <h2>Readings</h2>
-    <a href="settings.html" class="icon-btn">⚙</a>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
   </header>
 
   <main class="content">
+
+    <!-- FREE NUMEROLOGY READING -->
     <section class="card">
       <h3>Free Reading: Life Path Focus</h3>
       <div id="free-reading"></div>
+      <button id="go-to-numbers" class="secondary-btn">Go to My Numbers</button>
     </section>
 
-    <section class="card pro-only" id="advanced-readings"></section>
+    <!-- ADVANCED READINGS (PAYWALL) -->
+    <section class="card pro-only" id="advanced-readings">
+      <h3>Advanced Readings</h3>
+
+      <!-- ASTROLOGY -->
+      <div class="advanced-block" id="astro-block">
+        <h4>Astrology: Full Chart Overview</h4>
+        <p class="tip">
+          Includes Sun, Moon, Rising, 12 Houses, planetary placements and symbolic degrees.
+        </p>
+        <button class="primary-btn" id="astro-unlock-btn">Unlock Astrology Reading</button>
+        <div class="paywall" id="astro-paywall">
+          <p>Advanced astrology readings are part of the Pro tier.</p>
+          <a href="https://www.paypal.com" target="_blank" class="primary-btn">Upgrade via PayPal</a>
+        </div>
+        <pre id="astro-reading"></pre>
+      </div>
+
+      <!-- HUMAN DESIGN -->
+      <div class="advanced-block" id="hd-block">
+        <h4>Human Design: Type & Strategy</h4>
+        <p class="tip">
+          Symbolic Human Design profile based on your birth data and numerology seed.
+        </p>
+        <button class="primary-btn" id="hd-unlock-btn">Unlock Human Design Reading</button>
+        <div class="paywall" id="hd-paywall">
+          <p>Human Design readings are part of the Pro tier.</p>
+          <a href="https://www.paypal.com" target="_blank" class="primary-btn">Upgrade via PayPal</a>
+        </div>
+        <pre id="hd-reading"></pre>
+      </div>
+
+      <!-- TAROT -->
+      <div class="advanced-block" id="tarot-block">
+        <h4>Tarot: Three-Card Spread</h4>
+        <p class="tip">
+          Past, Present, Future spread seeded from your core numbers.
+        </p>
+        <button class="primary-btn" id="tarot-unlock-btn">Unlock Tarot Reading</button>
+        <div class="paywall" id="tarot-paywall">
+          <p>Tarot spreads are part of the Pro tier.</p>
+          <a href="https://www.paypal.com" target="_blank" class="primary-btn">Upgrade via PayPal</a>
+        </div>
+        <pre id="tarot-reading"></pre>
+      </div>
+
+    </section>
+
   </main>
 </body>
 </html>
