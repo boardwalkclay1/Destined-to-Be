@@ -1,67 +1,29 @@
 // js/dashboard/dashboard.js
-import { getState } from '../state.js';
-import { applyTierToDom } from '../tier.js';
+
+// Minimal dashboard script for a simple readings-focused app.
+// No state, no user data, no life path, no personalization.
 
 window.addEventListener('DOMContentLoaded', () => {
-  safeApplyTier();
-  hydrateTierPill();
-  hydrateSubhead();
   wireNav();
+  setTierPill(); // optional: keeps the UI consistent
 });
 
-function safeApplyTier() {
-  try {
-    if (typeof applyTierToDom === 'function') {
-      applyTierToDom();
-    }
-  } catch (e) {
-    // fail silently so nav still works
-    console.warn('Tier apply failed:', e);
-  }
-}
-
-function hydrateTierPill() {
-  let state;
-  try {
-    state = getState();
-  } catch {
-    return;
-  }
-
+// --- TIER PILL (STATIC OR LOCAL STORAGE) ---
+function setTierPill() {
   const pill = document.getElementById('tier-pill');
   if (!pill) return;
-  pill.textContent = state.tier === 'pro' ? 'Pro' : 'Free';
+
+  // If you want it fully static, replace this with: pill.textContent = 'Free';
+  const tier = localStorage.getItem('tier') || 'free';
+  pill.textContent = tier === 'pro' ? 'Pro' : 'Free';
 }
 
-function hydrateSubhead() {
-  let state;
-  try {
-    state = getState();
-  } catch {
-    return;
-  }
-
-  const sub = document.querySelector('.topbar-left .subhead');
-  if (!sub) return;
-
-  const name = state.user?.preferredName || state.user?.fullName;
-  const lp = state.numbers?.lifePath?.value;
-
-  if (name && lp) {
-    sub.textContent = `${name} • Life Path ${lp}`;
-  } else if (name) {
-    sub.textContent = `${name} • Dashboard`;
-  } else {
-    sub.textContent = 'Numerology OS Dashboard';
-  }
-}
-
+// --- NAVIGATION ---
 function wireNav() {
   document.querySelectorAll('[data-nav]').forEach(el => {
     el.addEventListener('click', () => {
       const target = el.getAttribute('data-nav');
-      if (!target) return;
-      window.location.href = target;
+      if (target) window.location.href = target;
     });
   });
 }
