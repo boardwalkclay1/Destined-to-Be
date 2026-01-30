@@ -257,3 +257,49 @@ button {
   font-size: 12px;
   color: #cbd5f5;
 }
+/* Bubble Inputs */
+.bubble-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(11,16,32,0.85);
+  color: var(--text-main);
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.bubble-input:focus {
+  outline: none;
+  border-color: rgba(239,68,68,0.8);
+  box-shadow: 0 0 12px rgba(239,68,68,0.4);
+}
+
+/* Bubble Dropdown */
+.bubble-select {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(11,16,32,0.85);
+  color: var(--text-main);
+  font-size: 14px;
+  appearance: none;
+  transition: 0.25s ease;
+}
+
+.bubble-select:focus {
+  outline: none;
+  border-color: rgba(239,68,68,0.8);
+  box-shadow: 0 0 12px rgba(239,68,68,0.4);
+}
+
+/* Dropdown arrow */
+.bubble-select {
+  background-image: linear-gradient(135deg, rgba(239,68,68,0.4), rgba(11,16,32,0.85));
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+}
