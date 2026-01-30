@@ -5,10 +5,7 @@
   <title>Dashboard – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- adjust if your CSS is in styles/styles.css -->
   <link rel="stylesheet" href="styles.css">
-
-  <!-- only the dashboard script; it will import what it needs -->
   <script type="module" src="js/dashboard/dashboard.js"></script>
 </head>
 
@@ -18,7 +15,8 @@
   <header class="topbar">
     <div class="topbar-left">
       <h2>Destined to Be</h2>
-      <span class="subhead">Numerology OS Dashboard</span>
+      <span class="subhead">Your Numerology Operating System</span>
+      <span class="cosmic-date" id="cosmic-date"></span>
     </div>
 
     <div class="topbar-right">
@@ -32,46 +30,50 @@
 
     <!-- CORE -->
     <section class="card">
-      <h3>Core</h3>
+      <h3>Core Frequencies</h3>
+      <p class="section-sub">Your foundational numbers & daily alignment</p>
       <div class="link-grid">
-        <button data-nav="profile.html" class="secondary-btn">Profile</button>
-        <button data-nav="number.html" class="secondary-btn">My Numbers</button>
-        <button data-nav="spirit.html" class="primary-btn">Spirit Guide</button>
-        <button data-nav="daily_energy.html" class="secondary-btn">Daily Energy</button>
-        <button data-nav="compatibility.html" class="secondary-btn">Compatibility</button>
+        <button data-nav="profile.html" class="secondary-btn">Profile Blueprint</button>
+        <button data-nav="number.html" class="secondary-btn">My Core Numbers</button>
+        <button data-nav="spirit.html" class="primary-btn">Spirit Guide Portal</button>
+        <button data-nav="daily_energy.html" class="secondary-btn">Daily Energy Pulse</button>
+        <button data-nav="compatibility.html" class="secondary-btn">Compatibility Matrix</button>
         <button data-nav="vibration-tools.html" class="secondary-btn">Vibration Tools</button>
       </div>
     </section>
 
     <!-- GROWTH -->
     <section class="card">
-      <h3>Growth & Tracking</h3>
+      <h3>Growth & Cycles</h3>
+      <p class="section-sub">Track patterns, cycles, and personal evolution</p>
       <div class="link-grid">
-        <button data-nav="journal.html" class="secondary-btn">Journal</button>
+        <button data-nav="journal.html" class="secondary-btn">Numerology Journal</button>
         <button data-nav="pattern-tracker.html" class="secondary-btn">Pattern Tracker</button>
         <button data-nav="cycles-calendar.html" class="secondary-btn">Cycles Calendar</button>
-        <button data-nav="reading.html" class="secondary-btn">Readings</button>
+        <button data-nav="reading.html" class="secondary-btn">Guided Readings</button>
         <button data-nav="meanings.html" class="secondary-btn">Meanings Library</button>
-        <button data-nav="learn.html" class="secondary-btn">Learn</button>
+        <button data-nav="learn.html" class="secondary-btn">Learn Numerology</button>
       </div>
     </section>
 
     <!-- SYSTEM -->
     <section class="card">
-      <h3>System & Account</h3>
+      <h3>System & Alignment</h3>
+      <p class="section-sub">Your account, sync, and energetic settings</p>
       <div class="link-grid">
         <button data-nav="account.html" class="secondary-btn">Account</button>
         <button data-nav="backup.html" class="secondary-btn">Backup</button>
         <button data-nav="restore.html" class="secondary-btn">Restore</button>
         <button data-nav="sync.html" class="secondary-btn">Sync</button>
-        <button data-nav="upgrade.html" class="primary-btn">Upgrade</button>
+        <button data-nav="upgrade.html" class="primary-btn">Upgrade Tier</button>
         <button data-nav="system-status.html" class="secondary-btn">System Status</button>
       </div>
     </section>
 
     <!-- RESEARCH / DATA -->
     <section class="card">
-      <h3>Research & Data</h3>
+      <h3>Research & Data Streams</h3>
+      <p class="section-sub">Engines, datasets, and metaphysical analysis</p>
       <div class="link-grid">
         <button data-nav="research.html" class="secondary-btn">Research Lab</button>
         <button data-nav="data-viewer.html" class="secondary-btn">Data Viewer</button>
@@ -85,6 +87,7 @@
     <!-- ENGINE / DEV -->
     <section class="card">
       <h3>Engine & Dev Tools</h3>
+      <p class="section-sub">Internal engines powering your numerology OS</p>
       <div class="link-grid">
         <button data-nav="engine-test.html" class="secondary-btn">Engine Test</button>
         <button data-nav="engine-map.html" class="secondary-btn">Engine Map</button>
@@ -98,6 +101,7 @@
     <!-- META / SUPPORT -->
     <section class="card">
       <h3>Meta & Support</h3>
+      <p class="section-sub">Guidance, policies, and system wisdom</p>
       <div class="link-grid">
         <button data-nav="about.html" class="secondary-btn">About</button>
         <button data-nav="support.html" class="secondary-btn">Support</button>
@@ -118,6 +122,23 @@
     <button data-nav="spirit.html">Spirit</button>
     <button data-nav="settings.html">Settings</button>
   </footer>
+
+  <script>
+    // Optional: cosmic date injection
+    const el = document.getElementById('cosmic-date');
+    if (el) {
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.getMonth() + 1;
+      const year = now.getFullYear();
+      const sum = (day + month + year)
+        .toString()
+        .split('')
+        .reduce((a, b) => a + Number(b), 0);
+
+      el.textContent = `Today’s Universal Number: ${sum}`;
+    }
+  </script>
 
 </body>
 </html>
