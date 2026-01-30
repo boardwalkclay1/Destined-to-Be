@@ -11,21 +11,38 @@
 
 <body class="app-body">
   <header class="topbar">
-    <h2>Journal</h2>
+    <h2>Spiritual Journal</h2>
     <a href="dashboard.html" class="icon-btn">🏠</a>
   </header>
 
   <main class="content">
+
+    <!-- NEW ENTRY -->
     <section class="card">
       <h3>New Entry</h3>
-      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts..."></textarea>
+
+      <p class="tip">Date & Time auto‑recorded when you save.</p>
+
+      <textarea id="journal-entry" rows="6" placeholder="Write your thoughts, experiences, or reflections..."></textarea>
+
+      <h4>Optional Spiritual Notes</h4>
+      <textarea id="journal-spiritual" rows="3" placeholder="Signs, synchronicities, dreams, numbers, energy shifts..."></textarea>
+
+      <h4>Why This Matters</h4>
+      <textarea id="journal-why" rows="3" placeholder="Why is this important right now?"></textarea>
+
+      <h4>Life Context</h4>
+      <textarea id="journal-context" rows="3" placeholder="What’s happening in your life that connects to this?"></textarea>
+
       <button id="save-entry" class="primary-btn">Save Entry</button>
     </section>
 
+    <!-- PAST ENTRIES -->
     <section class="card">
       <h3>Past Entries</h3>
-      <ul id="journal-list"></ul>
+      <ul id="journal-list" class="journal-list"></ul>
     </section>
+
   </main>
 </body>
 </html>
