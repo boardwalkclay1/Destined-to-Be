@@ -5,7 +5,7 @@
   <title>Compatibility – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles.css">
   <script type="module" src="js/compatibility/compatibility.js"></script>
 </head>
 
@@ -16,16 +16,51 @@
   </header>
 
   <main class="content">
+
+    <!-- PERSON A -->
     <section class="card">
       <h3>Person A</h3>
       <input type="text" id="name-a" placeholder="Full name">
       <input type="date" id="birth-a">
+
+      <h4>Optional Numerology Inputs</h4>
+      <input type="number" id="lp-a" placeholder="Life Path">
+      <input type="number" id="exp-a" placeholder="Expression Number">
+      <input type="number" id="soul-a" placeholder="Soul Urge">
+      <input type="number" id="pers-a" placeholder="Personality Number">
+      <input type="number" id="dest-a" placeholder="Destiny Number">
+      <input type="number" id="att-a" placeholder="Attitude Number">
+
+      <select id="sign-a">
+        <option value="">Zodiac Sign (optional)</option>
+        <option>Aries</option><option>Taurus</option><option>Gemini</option>
+        <option>Cancer</option><option>Leo</option><option>Virgo</option>
+        <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+        <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+      </select>
     </section>
 
+    <!-- PERSON B -->
     <section class="card">
       <h3>Person B</h3>
       <input type="text" id="name-b" placeholder="Full name">
       <input type="date" id="birth-b">
+
+      <h4>Optional Numerology Inputs</h4>
+      <input type="number" id="lp-b" placeholder="Life Path">
+      <input type="number" id="exp-b" placeholder="Expression Number">
+      <input type="number" id="soul-b" placeholder="Soul Urge">
+      <input type="number" id="pers-b" placeholder="Personality Number">
+      <input type="number" id="dest-b" placeholder="Destiny Number">
+      <input type="number" id="att-b" placeholder="Attitude Number">
+
+      <select id="sign-b">
+        <option value="">Zodiac Sign (optional)</option>
+        <option>Aries</option><option>Taurus</option><option>Gemini</option>
+        <option>Cancer</option><option>Leo</option><option>Virgo</option>
+        <option>Libra</option><option>Scorpio</option><option>Sagittarius</option>
+        <option>Capricorn</option><option>Aquarius</option><option>Pisces</option>
+      </select>
     </section>
 
     <button id="run-compatibility" class="primary-btn">Analyze Compatibility</button>
@@ -34,6 +69,7 @@
       <h3>Results</h3>
       <pre id="compatibility-output"></pre>
     </section>
+
   </main>
 </body>
 </html>
