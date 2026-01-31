@@ -12,23 +12,63 @@
 <body class="app-body">
   <header class="topbar">
     <h2>Vibration Tools</h2>
-    <a href="numbers.html" class="icon-btn">🔢</a>
+    <a href="numbers.html" class="icon-btn" title="My Numbers">🔢</a>
   </header>
 
   <main class="content">
+
+    <!-- WORD / NAME VIBRATION -->
     <section class="card">
       <h3>Word / Name Vibration</h3>
-      <input type="text" id="vibration-word" placeholder="Enter word or name">
-      <button id="calc-vibration" class="primary-btn">Calculate</button>
-      <pre id="vibration-output"></pre>
+      <p class="small-text">
+        See the numerology of any word, name, brand, or phrase. Uses Pythagorean mapping and master numbers.
+      </p>
+
+      <input
+        type="text"
+        id="vibration-word"
+        class="bubble-input"
+        placeholder="Enter word, name, or phrase"
+      >
+
+      <div class="inline-grid">
+        <label class="small-text">
+          <input type="checkbox" id="vibration-keep-master" checked>
+          Keep master numbers (11, 22, 33)
+        </label>
+      </div>
+
+      <button id="calc-vibration" class="primary-btn">Calculate Vibration</button>
+
+      <div id="vibration-output" class="seen-output"></div>
     </section>
 
+    <!-- ADDRESS VIBRATION -->
     <section class="card">
       <h3>Address Vibration</h3>
-      <input type="text" id="vibration-address" placeholder="Enter address">
-      <button id="calc-address" class="primary-btn">Calculate</button>
-      <pre id="address-output"></pre>
+      <p class="small-text">
+        Decode the vibration of a home, studio, or business address. Numbers + letters are both counted.
+      </p>
+
+      <input
+        type="text"
+        id="vibration-address"
+        class="bubble-input"
+        placeholder="123 Destiny Lane Apt 4B"
+      >
+
+      <button id="calc-address" class="primary-btn">Calculate Address Vibration</button>
+
+      <div id="address-output" class="seen-output"></div>
     </section>
+
+    <!-- HISTORY / FAVORITES -->
+    <section class="card">
+      <h3>Recent Vibrations</h3>
+      <p class="small-text">Your last few calculations are stored locally so you can compare and revisit.</p>
+      <ul id="vibration-history" class="pattern-history-list"></ul>
+    </section>
+
   </main>
 </body>
 </html>
