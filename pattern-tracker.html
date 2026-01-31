@@ -16,17 +16,55 @@
   </header>
 
   <main class="content">
+
+    <!-- LOG PATTERN -->
     <section class="card">
       <h3>Log a Pattern</h3>
-      <input type="text" id="pattern-number" placeholder="111, 222, 1234...">
-      <textarea id="pattern-notes" rows="3" placeholder="Context or meaning..."></textarea>
-      <button id="save-pattern" class="primary-btn">Save</button>
+
+      <input
+        type="text"
+        id="pattern-number"
+        class="bubble-input"
+        placeholder="111, 222, 1234..."
+      >
+
+      <textarea
+        id="pattern-notes"
+        class="bubble-input"
+        rows="3"
+        placeholder="Where did you see it? What was happening?"
+      ></textarea>
+
+      <select id="pattern-mood" class="bubble-select">
+        <option value="">Mood / Charge (optional)</option>
+        <option value="neutral">Neutral / Curious</option>
+        <option value="light">Light / Encouraging</option>
+        <option value="intense">Intense / Confronting</option>
+        <option value="synchronistic">Wild synchronicity</option>
+      </select>
+
+      <button id="save-pattern" class="primary-btn">Save Pattern</button>
     </section>
 
+    <!-- QUICK INTERPRETATION -->
+    <section class="card">
+      <h3>Instant Interpretation</h3>
+      <p class="small-text">Based on numerology reduction, repetition, and your log history.</p>
+      <div id="instant-interpretation" class="seen-output"></div>
+    </section>
+
+    <!-- HISTORY -->
     <section class="card">
       <h3>History</h3>
-      <ul id="pattern-history"></ul>
+      <ul id="pattern-history" class="pattern-history-list"></ul>
     </section>
+
+    <!-- ANALYTICS -->
+    <section class="card">
+      <h3>Pattern Analytics</h3>
+      <div id="pattern-analytics"></div>
+    </section>
+
   </main>
 </body>
 </html>
