@@ -6,25 +6,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="styles/styles.css">
-  <script type="module" src="js/cycles/calendar.js"></script>
+  <script type="module" src="js/cycles-calendar/cycles-calendar.js"></script>
 </head>
 
 <body class="app-body">
   <header class="topbar">
     <h2>Cycles Calendar</h2>
-    <a href="numbers.html" class="icon-btn">🔢</a>
+    <a href="dashboard.html" class="icon-btn">🏠</a>
   </header>
 
   <main class="content">
+
+    <!-- USER SETUP -->
     <section class="card">
-      <h3>Select Month</h3>
-      <input type="month" id="calendar-month">
+      <h3>Your Core Date</h3>
+      <p class="tip">
+        Set your birth date to generate personal day, month, and year cycles across the calendar.
+      </p>
+
+      <input class="bubble-input" type="date" id="birth-date">
+
+      <button id="save-birth" class="primary-btn small-btn">Save Birth Date</button>
     </section>
 
+    <!-- CALENDAR CONTROLS -->
     <section class="card">
       <h3>Calendar</h3>
-      <div id="calendar-grid"></div>
+
+      <div class="calendar-controls">
+        <button id="prev-month" class="secondary-btn small-btn">◀</button>
+        <div id="calendar-label"></div>
+        <button id="next-month" class="secondary-btn small-btn">▶</button>
+      </div>
+
+      <div class="cycle-toggle-row">
+        <label><input type="checkbox" id="show-personal-day" checked> Personal Day</label>
+        <label><input type="checkbox" id="show-personal-month" checked> Personal Month</label>
+        <label><input type="checkbox" id="show-personal-year" checked> Personal Year</label>
+        <label><input type="checkbox" id="show-universal-day" checked> Universal Day</label>
+      </div>
+
+      <div id="calendar-grid" class="calendar-grid"></div>
     </section>
+
+    <!-- DETAIL PANEL -->
+    <section class="card">
+      <h3>Selected Day Details</h3>
+      <div id="day-details" class="day-details">
+        <p class="tip">Tap a day in the calendar to see its cycle breakdown.</p>
+      </div>
+    </section>
+
   </main>
 </body>
 </html>
