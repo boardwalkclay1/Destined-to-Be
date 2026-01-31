@@ -11,11 +11,11 @@
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/tier.js"></script>
 
-  <!-- Numbers page controller -->
-  <script type="module" src="js/numbers/numbers.js"></script>
-
   <!-- Full engine aggregator -->
   <script type="module" src="js/engine/index.js"></script>
+
+  <!-- Numbers page controller -->
+  <script type="module" src="js/numbers/numbers.js"></script>
 </head>
 
 <body class="app-body">
@@ -97,7 +97,12 @@
     <section class="card">
       <h3>Number You Keep Seeing</h3>
       <div class="seen-grid">
-        <input type="text" id="seen-number" placeholder="111, 222, 1234...">
+        <input
+          type="text"
+          id="seen-number"
+          class="bubble-input"
+          placeholder="111, 222, 1234..."
+        >
         <button id="interpret-number" class="primary-btn">Interpret</button>
       </div>
       <div id="seen-result" class="seen-output"></div>
@@ -105,7 +110,7 @@
 
   </main>
 
-  <!-- EXPANDABLE SECTION SCRIPT -->
+  <!-- EXPANDABLE SECTION TOGGLING -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.expandable').forEach(section => {
@@ -114,11 +119,11 @@
 
         btn.addEventListener('click', () => {
           section.classList.toggle('open');
-          body.style.display = section.classList.contains('open') ? 'block' : 'none';
-          btn.textContent = section.classList.contains('open') ? '▲' : '▼';
+          const open = section.classList.contains('open');
+          body.style.display = open ? 'block' : 'none';
+          btn.textContent = open ? '▲' : '▼';
         });
 
-        // Start collapsed
         body.style.display = 'none';
       });
     });
