@@ -2,30 +2,80 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Account – Destined to Be</title>
+  <title>Account Overview – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Core state -->
   <script type="module" src="js/state.js"></script>
+
+  <!-- Controller -->
+  <script type="module" src="js/account/overview.js"></script>
 </head>
 
 <body class="app-body">
+
   <header class="topbar">
-    <h2>Account</h2>
+    <h2>Account Overview</h2>
     <a href="settings.html" class="icon-btn">⚙</a>
   </header>
 
   <main class="content">
+
+    <!-- PROFILE -->
     <section class="card">
-      <h3>Profile Data</h3>
-      <p>Your numerology profile is stored locally on this device.</p>
+      <h3>Your Profile</h3>
+      <div id="profile-block"></div>
+    </section>
+
+    <!-- CORE NUMBERS -->
+    <section class="card">
+      <h3>Your Core Numbers</h3>
+      <div id="numbers-block"></div>
+    </section>
+
+    <!-- CYCLES -->
+    <section class="card">
+      <h3>Your Current Cycles</h3>
+      <div id="cycles-block"></div>
+    </section>
+
+    <!-- PATTERN TRACKER -->
+    <section class="card">
+      <h3>Recent Patterns</h3>
+      <ul id="patterns-block"></ul>
+      <a href="patterns.html" class="secondary-btn">Open Pattern Tracker</a>
+    </section>
+
+    <!-- VIBRATION HISTORY -->
+    <section class="card">
+      <h3>Recent Vibrations</h3>
+      <ul id="vibration-block"></ul>
+      <a href="vibration-tools.html" class="secondary-btn">Open Vibration Tools</a>
+    </section>
+
+    <!-- JOURNAL -->
+    <section class="card">
+      <h3>Recent Journal Entries</h3>
+      <ul id="journal-block"></ul>
+      <a href="journal.html" class="secondary-btn">Open Journal</a>
+    </section>
+
+    <!-- BACKUP / RESTORE -->
+    <section class="card">
+      <h3>Data Tools</h3>
       <button class="secondary-btn" onclick="location.href='backup.html'">Backup Data</button>
       <button class="secondary-btn" onclick="location.href='restore.html'">Restore Data</button>
     </section>
 
-    <section class="card">
+    <!-- DANGER ZONE -->
+    <section class="card danger-zone">
       <h3>Danger Zone</h3>
       <button id="delete-account" class="danger-btn">Delete All Data</button>
     </section>
+
   </main>
+
 </body>
 </html>
