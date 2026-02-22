@@ -97,7 +97,12 @@ function renderNumbersSummary(state) {
   // If numbers not yet computed, compute them
   let nums = numbers;
   if (!nums || Object.keys(nums).length === 0) {
-    try { nums = computeAll(user.fullName || '', user.birthdate || ''); } catch { nums = {}; }
+    try {
+      nums = computeAll(user.fullName || '', user.birthdate || '');
+    } catch (err) {
+      console.warn('Could not compute numerology numbers:', err);
+      nums = {};
+    }
   }
 
   const entries = [

@@ -91,7 +91,7 @@ function renderFeed(filter = "all", query = "") {
     card.innerHTML = `
       <div class="post-meta">
         <span class="post-author-avatar">${(post.author || "A")[0].toUpperCase()}</span>
-        <span class="post-author">${post.author || "Anonymous"}</span>
+        <span class="post-author">${escapeHtml(post.author || "Anonymous")}</span>
         <span class="post-category-badge">${icon} ${cat}</span>
         <span class="post-time">${timeAgo(post.ts)}</span>
       </div>
@@ -101,7 +101,9 @@ function renderFeed(filter = "all", query = "") {
         <button class="post-like-btn ${alreadyLiked ? "liked" : ""}" data-id="${post.id}">
           ${alreadyLiked ? "♥" : "♡"} ${likes}
         </button>
-        <button class="post-delete-btn" data-id="${post.id}" title="Delete" aria-label="Delete post">✕</button>
+        ${post.author === myName
+          ? `<button class="post-delete-btn" data-id="${post.id}" title="Delete my post" aria-label="Delete post">✕</button>`
+          : ""}
       </div>
     `;
 
@@ -150,7 +152,7 @@ function addPost(content, category, photoDataUrl = null, isVideo = false) {
   if (!content.trim() && !photoDataUrl) return false;
   const posts = loadPosts();
   posts.unshift({
-    id: Date.now(),
+    id: generateId(),
     author: getAuthor(),
     content: content.trim(),
     category,
@@ -166,7 +168,8 @@ function addPost(content, category, photoDataUrl = null, isVideo = false) {
 
 function likePost(id) {
   const posts = loadPosts();
-  const post = posts.find(p => p.id === Number(id));
+  // IDs can be UUID strings or legacy numbers
+  const post = posts.find(p => String(p.id) === String(id));
   if (!post) return;
   const me = getAuthor();
   if (!post.likedBy) post.likedBy = [];
@@ -181,7 +184,7 @@ function likePost(id) {
 }
 
 function deletePost(id) {
-  const posts = loadPosts().filter(p => p.id !== Number(id));
+  const posts = loadPosts().filter(p => String(p.id) !== String(id));
   savePosts(posts);
 }
 
@@ -212,8 +215,7 @@ function initPhotoUpload() {
 
   if (!dropZone) return;
 
-  dropZone.addEventListener("click", () => photoInput?.click());
-
+  // Drag and drop support on drop zone
   dropZone.addEventListener("dragover", e => {
     e.preventDefault();
     dropZone.style.borderColor = "var(--primary)";
@@ -230,6 +232,7 @@ function initPhotoUpload() {
     if (file) handleFileSelected(file, photoPreview, videoPreview);
   });
 
+  // Visible file input handles keyboard and click natively
   photoInput?.addEventListener("change", () => {
     const file = photoInput.files?.[0];
     if (file) handleFileSelected(file, photoPreview, videoPreview);
@@ -261,12 +264,21 @@ function handleFileSelected(file, photoPreview, videoPreview) {
 
 // ── Seed Demo Posts ───────────────────────────────────────────────────────────
 
+function generateId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+// ── Seed Demo Posts ───────────────────────────────────────────────────────────
+
 function seedDemoPostsIfEmpty() {
   const existing = loadPosts();
   if (existing.length > 0) return;
   const demos = [
     {
-      id: Date.now() - 10000,
+      id: generateId(),
       author: "StarSoul",
       content: "Just pulled The Tower in my Celtic Cross reading and it perfectly describes the shake-up happening in my life right now. Has anyone else experienced major synchronicities with their spreads? ✦",
       category: "tarot",
@@ -274,7 +286,7 @@ function seedDemoPostsIfEmpty() {
       ts: new Date(Date.now() - 3600000).toISOString()
     },
     {
-      id: Date.now() - 20000,
+      id: generateId(),
       author: "NumerologyNerd",
       content: "Life Path 11 here — I've been doing daily card pulls for 30 days straight and tracking which cards come up on which personal day number. The correlations are WILD. On Personal Day 7 I almost always pull The Hermit or High Priestess. 🔢🔮",
       category: "numerology",
@@ -282,7 +294,7 @@ function seedDemoPostsIfEmpty() {
       ts: new Date(Date.now() - 7200000).toISOString()
     },
     {
-      id: Date.now() - 30000,
+      id: generateId(),
       author: "MoonChild",
       content: "Keep seeing 333 everywhere this week. The app says: 'Creative expansion, self-expression, and support from your guides.' Starting to think my guides are nudging me to share my art publicly… anyone else in a creative breakthrough?",
       category: "synchronicity",
@@ -290,7 +302,7 @@ function seedDemoPostsIfEmpty() {
       ts: new Date(Date.now() - 14400000).toISOString()
     },
     {
-      id: Date.now() - 40000,
+      id: generateId(),
       author: "AquariusSoul",
       content: "Question for the community: When The Moon shows up in the 'Root Cause' position of a Career spread, how do you interpret that? My intuition says fear/illusion is blocking my career growth but curious about your takes.",
       category: "question",

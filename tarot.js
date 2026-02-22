@@ -1,7 +1,7 @@
 // tarot.js — Advanced Tarot Engine with Full 78-Card Deck
 
 // ============================================================
-// FISHER-YATES SHUFFLE (cryptographically seeded via entropy)
+// FISHER-YATES SHUFFLE (double-pass pseudorandom shuffle)
 // ============================================================
 
 function shuffleDeck(deck) {
@@ -10,7 +10,7 @@ function shuffleDeck(deck) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  // Second pass for extra entropy
+  // Second pass for additional mixing
   for (let i = 0; i < arr.length; i++) {
     const j = Math.floor(Math.random() * arr.length);
     [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -620,7 +620,12 @@ function autoPick() {
   // Randomly assign reversed (20% chance per card)
   chosen = chosen.map(card => {
     if (Math.random() < 0.2 && card.reversed) {
-      return { ...card, isReversed: true, upright: card.reversed, advice: card.advice };
+      return {
+        ...card,
+        isReversed: true,
+        upright: card.reversed,
+        advice: `(Reversed) ${card.advice}`
+      };
     }
     return { ...card, isReversed: false };
   });
@@ -644,12 +649,16 @@ function enableManualPick() {
         if (Math.random() < 0.2 && card.reversed) {
           card.isReversed = true;
           card.upright = card.reversed;
+          card.advice = `(Reversed) ${card.advice}`;
         } else {
           card.isReversed = false;
         }
         chosen.push(card);
         el.classList.add("picked", "flipped");
-        el.querySelector(".tarot-card-label").textContent = card.name.substring(0, 6);
+        const shortName = card.name.length > 10
+          ? card.name.substring(0, 9) + "…"
+          : card.name;
+        el.querySelector(".tarot-card-label").textContent = shortName;
         renderChosen();
       }
     };
@@ -659,6 +668,10 @@ function enableManualPick() {
 // ============================================================
 // LIFE PATH CONNECTION
 // ============================================================
+
+function sumDigitsOf(n) {
+  return String(n).split("").reduce((a, ch) => a + Number(ch), 0);
+}
 
 function renderLifePathConnection() {
   const el = document.getElementById("lp-connection");
@@ -672,11 +685,10 @@ function renderLifePathConnection() {
       const birth = st?.user?.birthdate || st?.user?.birthDate || st?.profile?.birthDate || "";
       if (birth) {
         const d = new Date(birth);
-        const sum = [...d.getDate().toString(), ...(d.getMonth() + 1).toString(), ...d.getFullYear().toString()]
-          .reduce((a, ch) => a + Number(ch), 0);
+        const sum = sumDigitsOf(d.getDate()) + sumDigitsOf(d.getMonth() + 1) + sumDigitsOf(d.getFullYear());
         let n = sum;
         while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
-          n = [...n.toString()].reduce((a, ch) => a + Number(ch), 0);
+          n = sumDigitsOf(n);
         }
         lifePath = n;
       }

@@ -55,11 +55,14 @@
       <!-- Photo post -->
       <div id="tab-photo" class="composer-panel" style="display:none;">
         <div class="photo-upload-area" id="photo-drop-zone">
-          <span id="photo-drop-label">📷 Click or drag a photo / video here</span>
-          <input type="file" id="photo-input" accept="image/*,video/*" style="display:none;">
+          <span id="photo-drop-label">📷 Drag a photo / video here, or use the button below</span>
           <img id="photo-preview" style="display:none;max-width:100%;border-radius:10px;margin-top:8px;" alt="">
           <video id="video-preview" style="display:none;max-width:100%;border-radius:10px;margin-top:8px;" controls></video>
         </div>
+        <label class="file-label" style="display:block;margin-top:8px;">
+          <span style="display:none;">Select photo or video</span>
+          <input type="file" id="photo-input" accept="image/*,video/*" aria-label="Select photo or video to share">
+        </label>
         <textarea id="photo-caption" class="bubble-input" rows="2"
           placeholder="Add a caption…"
           style="border-radius:14px;resize:vertical;margin-top:8px;"></textarea>
