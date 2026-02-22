@@ -4,46 +4,73 @@
   <meta charset="UTF-8">
   <title>Tarot Reading – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="styles.css">
   <script type="module" src="tarot.js"></script>
 </head>
 
 <body class="app-body">
 
   <header class="topbar">
-    <h2>Tarot Reading</h2>
-    <a href="../dashboard.html" class="icon-btn">🏠</a>
+    <div class="topbar-left">
+      <a href="dashboard.html" class="icon-btn" title="Back">←</a>
+      <h2>Tarot Reading</h2>
+    </div>
+    <span class="subhead topbar-right">108-Card Deck</span>
   </header>
 
   <main class="content">
 
+    <!-- NUMEROLOGY CONNECTION -->
+    <section class="card">
+      <h3>Your Numerology Connection</h3>
+      <div id="lp-connection" class="lp-connection-container">Loading…</div>
+    </section>
+
+    <!-- SPREAD SELECTION -->
     <section class="card">
       <h3>Choose Your Spread</h3>
-
       <div class="spread-options">
-        <button class="primary-btn" data-spread="1">1 Card</button>
-        <button class="primary-btn" data-spread="2">2 Cards</button>
-        <button class="primary-btn" data-spread="3">3 Cards</button>
+        <button class="secondary-btn active" data-spread="1">Daily Card</button>
+        <button class="secondary-btn" data-spread="3">Past · Present · Future</button>
+        <button class="secondary-btn" data-spread="5-love">Love Spread</button>
+        <button class="secondary-btn" data-spread="5-career">Career Spread</button>
+        <button class="secondary-btn" data-spread="celtic">Celtic Cross</button>
+        <button class="secondary-btn" data-spread="7-chakra">Chakra Reading</button>
       </div>
 
-      <div class="pick-options" style="margin-top:10px;">
-        <button class="secondary-btn" id="auto-pick">Auto Pick</button>
-        <button class="secondary-btn" id="manual-pick">Manual Pick</button>
+      <div id="spread-info" style="margin-top: 12px;"></div>
+
+      <div class="pick-options" style="margin-top: 14px; display: flex; gap: 10px;">
+        <button class="primary-btn" id="auto-pick" style="flex:1;">✦ Auto Draw</button>
+        <button class="secondary-btn" id="manual-pick" style="flex:1;">✋ Manual Pick</button>
       </div>
     </section>
 
+    <!-- DECK -->
     <section class="card">
-      <h3>Deck</h3>
+      <h3>The Deck <span style="font-size:11px;color:var(--text-muted);font-weight:400;">(108 cards — click Manual Pick, then choose)</span></h3>
       <div id="deck-container" class="deck-container"></div>
     </section>
 
-    <section class="card">
-      <h3>Your Cards</h3>
+    <!-- DRAWN CARDS -->
+    <section class="card" id="reading-section">
+      <h3>Your Reading</h3>
       <div id="chosen-cards" class="chosen-cards"></div>
+      <button id="share-reading-btn" class="secondary-btn" style="display:none;margin-top:14px;width:100%;">
+        🌐 Share to Community
+      </button>
     </section>
 
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-nav">
+    <button onclick="location.href='dashboard.html'">Dashboard</button>
+    <button onclick="location.href='number.html'">Numbers</button>
+    <button onclick="location.href='tarot.html'" class="active">Tarot</button>
+    <button onclick="location.href='community.html'">Community</button>
+    <button onclick="location.href='settings.html'">Settings</button>
+  </footer>
 
 </body>
 </html>

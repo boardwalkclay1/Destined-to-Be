@@ -5,7 +5,7 @@
   <title>Profile – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles.css">
 
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/profile/profile.js"></script>
@@ -25,6 +25,15 @@
   <!-- MAIN CONTENT -->
   <main class="content">
 
+    <!-- NUMEROLOGY SUMMARY (auto-computed) -->
+    <section class="card" id="numbers-summary-card" style="display:none;">
+      <h3>Your Numerology Blueprint</h3>
+      <div id="numbers-summary" class="numbers-summary-grid"></div>
+      <button id="share-profile-btn" class="secondary-btn" style="margin-top:12px;width:100%;">
+        🌐 Share to Community
+      </button>
+    </section>
+
     <!-- IDENTITY -->
     <section class="card">
       <h3>Identity</h3>
@@ -39,6 +48,23 @@
 
       <label>Birthdate
         <input type="date" id="birthdate">
+      </label>
+    </section>
+
+    <!-- BIO & SOCIAL -->
+    <section class="card">
+      <h3>About You</h3>
+
+      <label>Bio
+        <textarea id="bio" rows="3" placeholder="Share a little about your journey, path, or practice…"></textarea>
+      </label>
+
+      <label>Location (optional)
+        <input type="text" id="location" placeholder="City, country, or just 'Earth'">
+      </label>
+
+      <label>Website / Social Link (optional)
+        <input type="url" id="social-link" placeholder="https://…">
       </label>
     </section>
 
@@ -68,9 +94,18 @@
     </section>
 
     <!-- SAVE BUTTON -->
-    <button id="save-profile" class="primary-btn">Save & Recalculate</button>
+    <button id="save-profile" class="primary-btn">Save &amp; Recalculate</button>
 
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-nav">
+    <button onclick="location.href='dashboard.html'">Dashboard</button>
+    <button onclick="location.href='number.html'">Numbers</button>
+    <button onclick="location.href='tarot.html'">Tarot</button>
+    <button onclick="location.href='community.html'">Community</button>
+    <button onclick="location.href='settings.html'">Settings</button>
+  </footer>
 
 </body>
 </html>
