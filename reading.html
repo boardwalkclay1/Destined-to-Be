@@ -5,14 +5,24 @@
   <title>Readings – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
 
+  <!-- Global styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Readings logic -->
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/tier.js"></script>
   <script type="module" src="js/readings/readings.js"></script>
 </head>
 
-<body class="app-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="app-body" data-page="readings">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
+
   <header class="topbar">
     <h2>Readings</h2>
     <a href="dashboard.html" class="icon-btn">🏠</a>
@@ -76,5 +86,13 @@
     </section>
 
   </main>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
+
 </body>
 </html>
