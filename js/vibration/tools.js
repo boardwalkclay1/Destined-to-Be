@@ -1,6 +1,26 @@
 // js/vibration/tools.js
 
-// ---------- CORE NUMEROLOGY HELPERS ----------
+// ===============================
+// NORMALIZATION HELPERS
+// ===============================
+
+function normalizeLetters(str = "") {
+  return (str || "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "");
+}
+
+function normalizeDigits(str = "") {
+  return (str || "").replace(/\D/g, "");
+}
+
+function normalizeInput(str = "") {
+  return (str || "").trim();
+}
+
+// ===============================
+// PYTHAGOREAN LETTER MAP
+// ===============================
 
 const LETTER_MAP = {
   A:1,B:2,C:3,D:4,E:5,F:6,G:7,
@@ -9,27 +29,25 @@ const LETTER_MAP = {
   V:4,W:5,X:6,Y:7,Z:8
 };
 
-function onlyLetters(str = "") {
-  return (str || "").toUpperCase().replace(/[^A-Z]/g, "");
-}
-
-function onlyDigits(str = "") {
-  return (str || "").replace(/\D/g, "");
-}
-
-function pythagoreanValue(ch) {
+function letterValue(ch) {
   return LETTER_MAP[ch] || 0;
 }
+
+// ===============================
+// NUMEROLOGY REDUCTION
+// ===============================
 
 function reduceNum(n, keepMaster = true) {
   n = Number(n);
   if (!Number.isFinite(n)) return null;
+
   if (!keepMaster) {
     while (n > 9) {
       n = n.toString().split("").reduce((a, b) => a + Number(b), 0);
     }
     return n;
   }
+
   while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
     n = n.toString().split("").reduce((a, b) => a + Number(b), 0);
   }
@@ -40,7 +58,9 @@ function sumDigits(n) {
   return n.toString().split("").reduce((a, b) => a + Number(b), 0);
 }
 
-// ---------- MEANING MAPS ----------
+// ===============================
+// MEANINGS
+// ===============================
 
 const baseMeanings = {
   1: "Initiation, independence, and self-leadership.",
@@ -61,13 +81,17 @@ function meaningForNumber(n) {
   return baseMeanings[n] || "A unique blend of energies—feel into how this number lands in your body and life.";
 }
 
-// ---------- WORD / NAME VIBRATION ENGINE ----------
+// ===============================
+// WORD / NAME VIBRATION
+// ===============================
 
-function analyzeWordVibration(raw, keepMaster = true) {
-  const letters = onlyLetters(raw);
+export function analyzeWordVibration(raw, keepMaster = true) {
+  const input = normalizeInput(raw);
+  const letters = normalizeLetters(input);
+
   if (!letters) {
     return {
-      input: raw,
+      rawInput: raw,
       total: null,
       reduced: null,
       breakdown: [],
@@ -77,27 +101,31 @@ function analyzeWordVibration(raw, keepMaster = true) {
 
   const breakdown = letters.split("").map(ch => ({
     letter: ch,
-    value: pythagoreanValue(ch)
+    value: letterValue(ch)
   }));
 
   const total = breakdown.reduce((sum, item) => sum + item.value, 0);
   const reduced = reduceNum(total, keepMaster);
 
   return {
-    input: raw,
+    rawInput: raw,
+    lettersUsed: letters.split(""),
+    breakdown,
     total,
     reduced,
-    breakdown,
     meaning: meaningForNumber(reduced)
   };
 }
 
-// ---------- ADDRESS VIBRATION ENGINE ----------
+// ===============================
+// ADDRESS VIBRATION
+// ===============================
 
-function analyzeAddressVibration(raw, keepMaster = true) {
-  if (!raw || !raw.trim()) {
+export function analyzeAddressVibration(raw, keepMaster = true) {
+  const input = normalizeInput(raw);
+  if (!input) {
     return {
-      input: raw,
+      rawInput: raw,
       total: null,
       reduced: null,
       numberPart: null,
@@ -106,25 +134,28 @@ function analyzeAddressVibration(raw, keepMaster = true) {
     };
   }
 
-  const digits = onlyDigits(raw);
-  const letters = onlyLetters(raw);
+  const digits = normalizeDigits(input);
+  const letters = normalizeLetters(input);
 
   let numberPart = null;
   let letterPart = null;
 
   if (digits) {
+    const totalDigits = sumDigits(digits);
     numberPart = {
       raw: digits,
-      total: sumDigits(digits),
-      reduced: reduceNum(digits, keepMaster)
+      digitsUsed: digits.split(""),
+      total: totalDigits,
+      reduced: reduceNum(totalDigits, keepMaster)
     };
   }
 
   if (letters) {
-    const letterValues = letters.split("").map(pythagoreanValue);
+    const letterValues = letters.split("").map(letterValue);
     const totalLetters = letterValues.reduce((a, b) => a + b, 0);
     letterPart = {
       raw: letters,
+      lettersUsed: letters.split(""),
       total: totalLetters,
       reduced: reduceNum(totalLetters, keepMaster)
     };
@@ -139,24 +170,26 @@ function analyzeAddressVibration(raw, keepMaster = true) {
     : null;
 
   return {
-    input: raw,
-    total: combinedTotal || null,
-    reduced: combinedReduced,
+    rawInput: raw,
     numberPart,
     letterPart,
+    total: combinedTotal || null,
+    reduced: combinedReduced,
     meaning: combinedReduced
       ? meaningForNumber(combinedReduced)
       : "This address doesn’t resolve to a clear vibration yet—try including both numbers and street name."
   };
 }
 
-// ---------- STORAGE (RECENT HISTORY) ----------
+// ===============================
+// HISTORY
+// ===============================
 
-const STORAGE_KEY = "destined_vibration_history_v1";
+const HISTORY_KEY = "destined_vibration_history_v2";
 
-function loadHistory() {
+export function loadHistory() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(HISTORY_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -165,15 +198,13 @@ function loadHistory() {
   }
 }
 
-function saveHistory(list) {
+export function saveHistory(list) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-  } catch {
-    // ignore
-  }
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+  } catch {}
 }
 
-function addHistoryEntry(type, input, reduced, total) {
+export function addHistoryEntry(type, input, reduced, total) {
   const history = loadHistory();
   history.push({
     id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
@@ -183,140 +214,7 @@ function addHistoryEntry(type, input, reduced, total) {
     total,
     timestamp: new Date().toISOString()
   });
-  // keep last 20
   const trimmed = history.slice(-20);
   saveHistory(trimmed);
   return trimmed;
 }
-
-// ---------- RENDERING ----------
-
-function renderWordResult(result) {
-  const out = document.getElementById("vibration-output");
-  if (!out) return;
-
-  if (!result || result.total == null) {
-    out.innerHTML = `<p class="small-text">${result ? result.meaning : "Enter a word or name to calculate."}</p>`;
-    return;
-  }
-
-  const breakdownHtml = result.breakdown
-    .map(item => `<span class="pill">${item.letter} = ${item.value}</span>`)
-    .join(" ");
-
-  out.innerHTML = `
-    <p><strong>Input:</strong> ${result.input}</p>
-    <p><strong>Total:</strong> ${result.total}</p>
-    <p><strong>Reduced:</strong> ${result.reduced}</p>
-    <p class="small-text"><strong>Meaning:</strong> ${result.meaning}</p>
-    <div class="pill-row">${breakdownHtml}</div>
-  `;
-}
-
-function renderAddressResult(result) {
-  const out = document.getElementById("address-output");
-  if (!out) return;
-
-  if (!result || result.total == null) {
-    out.innerHTML = `<p class="small-text">${result ? result.meaning : "Enter an address to calculate."}</p>`;
-    return;
-  }
-
-  const numberBlock = result.numberPart
-    ? `<p><strong>Number part:</strong> ${result.numberPart.raw} → total ${result.numberPart.total}, reduced ${result.numberPart.reduced}</p>`
-    : `<p><strong>Number part:</strong> none</p>`;
-
-  const letterBlock = result.letterPart
-    ? `<p><strong>Letter part:</strong> ${result.letterPart.raw} → total ${result.letterPart.total}, reduced ${result.letterPart.reduced}</p>`
-    : `<p><strong>Letter part:</strong> none</p>`;
-
-  out.innerHTML = `
-    <p><strong>Input:</strong> ${result.input}</p>
-    ${numberBlock}
-    ${letterBlock}
-    <p><strong>Combined total:</strong> ${result.total}</p>
-    <p><strong>Combined reduced:</strong> ${result.reduced}</p>
-    <p class="small-text"><strong>Meaning:</strong> ${result.meaning}</p>
-  `;
-}
-
-function renderHistory(list) {
-  const el = document.getElementById("vibration-history");
-  if (!el) return;
-
-  if (!list.length) {
-    el.innerHTML = `<li class="small-text">No vibrations calculated yet. Your last 20 results will appear here.</li>`;
-    return;
-  }
-
-  el.innerHTML = list
-    .slice()
-    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-    .map(item => {
-      const date = new Date(item.timestamp);
-      const ts = Number.isNaN(date.getTime())
-        ? ""
-        : `${date.toLocaleDateString()} • ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
-      return `
-        <li class="pattern-item">
-          <div class="pattern-main">
-            <span class="pattern-number">${item.input}</span>
-            <span class="pattern-reduced">${item.type} → ${item.reduced ?? "–"}</span>
-          </div>
-          <div class="pattern-meta">
-            <span class="pattern-time">${ts}</span>
-          </div>
-        </li>
-      `;
-    })
-    .join("");
-}
-
-// ---------- EVENT HANDLERS ----------
-
-function handleWordCalc() {
-  const inputEl = document.getElementById("vibration-word");
-  const keepMasterEl = document.getElementById("vibration-keep-master");
-  if (!inputEl) return;
-
-  const raw = inputEl.value.trim();
-  const keepMaster = keepMasterEl ? keepMasterEl.checked : true;
-
-  const result = analyzeWordVibration(raw, keepMaster);
-  renderWordResult(result);
-
-  if (result.reduced != null) {
-    const history = addHistoryEntry("word", raw, result.reduced, result.total);
-    renderHistory(history);
-  }
-}
-
-function handleAddressCalc() {
-  const inputEl = document.getElementById("vibration-address");
-  const keepMasterEl = document.getElementById("vibration-keep-master");
-  if (!inputEl) return;
-
-  const raw = inputEl.value.trim();
-  const keepMaster = keepMasterEl ? keepMasterEl.checked : true;
-
-  const result = analyzeAddressVibration(raw, keepMaster);
-  renderAddressResult(result);
-
-  if (result.reduced != null) {
-    const history = addHistoryEntry("address", raw, result.reduced, result.total);
-    renderHistory(history);
-  }
-}
-
-// ---------- INIT ----------
-
-document.addEventListener("DOMContentLoaded", () => {
-  const history = loadHistory();
-  renderHistory(history);
-
-  const wordBtn = document.getElementById("calc-vibration");
-  const addrBtn = document.getElementById("calc-address");
-
-  if (wordBtn) wordBtn.addEventListener("click", handleWordCalc);
-  if (addrBtn) addrBtn.addEventListener("click", handleAddressCalc);
-});
