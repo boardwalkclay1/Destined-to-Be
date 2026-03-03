@@ -5,6 +5,9 @@
   <title>Destined to Be – Numerology Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
   <!-- Global styles -->
   <link rel="stylesheet" href="styles/styles.css">
   <link rel="stylesheet" href="styles/theme.css">
@@ -23,7 +26,11 @@
   </script>
 </head>
 
-<body class="landing-body cosmic-root">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="landing-body cosmic-root" data-page="landing">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
 
   <!-- BACKGROUND LAYERS -->
   <div class="bg-pages-layer" id="bgPagesLayer"></div>
@@ -92,6 +99,13 @@
       <p>Upgrade anytime for a one-time $6 unlock.</p>
     </footer>
   </div>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
 
   <!-- CINEMATIC PAGE FLIP ENGINE -->
   <script src="js/cosmic-engine.js"></script>
