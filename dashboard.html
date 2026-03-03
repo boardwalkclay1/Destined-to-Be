@@ -5,11 +5,21 @@
   <title>Dashboard – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles.css">
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Dashboard logic -->
   <script type="module" src="js/dashboard/dashboard.js"></script>
 </head>
 
-<body class="app-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="app-body" data-page="dashboard">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
 
   <!-- TOPBAR -->
   <header class="topbar">
@@ -59,8 +69,6 @@
       <h3>Account</h3>
       <div class="link-grid">
         <button data-nav="account.html" class="secondary-btn">Account</button>
-        <!-- Removed Backup -->
-        <!-- Removed Sync -->
         <button data-nav="restore.html" class="secondary-btn">Restore</button>
         <button data-nav="upgrade.html" class="primary-btn">Upgrade</button>
         <button data-nav="settings.html" class="secondary-btn">Settings</button>
@@ -77,6 +85,13 @@
     <button data-nav="reading.html">Readings</button>
     <button data-nav="settings.html">Settings</button>
   </footer>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
 
 </body>
 </html>
