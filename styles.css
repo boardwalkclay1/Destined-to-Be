@@ -14,7 +14,7 @@
   --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.6);
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 
-  /* Page backgrounds (FIXED TO /icons/) */
+  /* Page backgrounds — FIXED TO /icons/ */
   --page-default: url('../icons/icon-192.png');
   --page-numbers: url('../icons/numbers.jpg');
   --page-daily: url('../icons/daily-energy.jpg');
@@ -84,7 +84,3 @@ body.ui-ready {
   80%  { transform: rotateY(-360deg); }
   100% { transform: rotateY(-360deg); opacity: 0; }
 }
-
-/* ============================================================
-   YOUR ORIGINAL CSS (UNCHANGED BELOW THIS LINE)
-   ============================================================ */
