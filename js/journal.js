@@ -1,31 +1,41 @@
-// js/journal/journal.js
+// ===============================
+// JOURNAL STORAGE ENGINE
+// ===============================
 
-// Load existing entries
+// Load entries from localStorage
 function loadEntries() {
   const raw = localStorage.getItem("spiritualJournal");
   return raw ? JSON.parse(raw) : [];
 }
 
-// Save entries
+// Save entries to localStorage
 function saveEntries(entries) {
   localStorage.setItem("spiritualJournal", JSON.stringify(entries));
 }
 
-// Render entries
+// Create a unique ID for each entry
+function createId() {
+  return "j_" + Math.random().toString(36).slice(2, 10);
+}
+
+// ===============================
+// RENDERING ENGINE
+// ===============================
+
 function renderEntries() {
   const list = document.getElementById("journal-list");
   const entries = loadEntries();
 
   list.innerHTML = "";
 
-  entries.forEach((entry, index) => {
+  entries.forEach((entry) => {
     const li = document.createElement("li");
-    li.className = "journal-item";
+    li.className = "journal-item cinematic-entry";
 
     li.innerHTML = `
       <div class="journal-header">
-        <strong>${entry.date}</strong>
-        <span>${entry.time}</span>
+        <div class="journal-date">${entry.date}</div>
+        <div class="journal-time">${entry.time}</div>
       </div>
 
       <p class="journal-main">${entry.text}</p>
@@ -36,10 +46,18 @@ function renderEntries() {
     `;
 
     list.appendChild(li);
+
+    // Cinematic fade-in animation
+    requestAnimationFrame(() => {
+      li.classList.add("visible");
+    });
   });
 }
 
-// Save new entry
+// ===============================
+// SAVE NEW ENTRY
+// ===============================
+
 function saveEntry() {
   const text = document.getElementById("journal-entry").value.trim();
   const spiritual = document.getElementById("journal-spiritual").value.trim();
@@ -49,12 +67,13 @@ function saveEntry() {
   if (!text) return;
 
   const now = new Date();
-  const date = now.toLocaleDateString();
+  const date = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   const entries = loadEntries();
 
   entries.unshift({
+    id: createId(),
     date,
     time,
     text,
@@ -73,9 +92,11 @@ function saveEntry() {
   document.getElementById("journal-context").value = "";
 }
 
-// Init
+// ===============================
+// INIT
+// ===============================
+
 document.addEventListener("DOMContentLoaded", () => {
   renderEntries();
-
   document.getElementById("save-entry").addEventListener("click", saveEntry);
 });
