@@ -5,11 +5,22 @@
   <title>Login – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Login logic -->
   <script type="module" src="js/auth/login.js"></script>
 </head>
 
-<body class="auth-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="auth-body" data-page="login">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
+
   <div class="auth-container">
     <h1>Destined to Be</h1>
     <p class="subtitle">Welcome back.</p>
@@ -31,5 +42,13 @@
       New here? <a href="signup.html">Create an account</a>
     </p>
   </div>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
+
 </body>
 </html>
