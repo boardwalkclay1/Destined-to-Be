@@ -1,19 +1,60 @@
 // js/auth/login.js
 import { updateState } from '../state.js';
 
+// Storage key
 const AUTH_KEY = 'destinedToBeUsers_v1';
+const CURRENT_KEY = 'destinedToBeCurrentUser';
+
+// ===============================
+// LOAD + SAVE
+// ===============================
 
 function loadUsers() {
   try {
-    return JSON.parse(localStorage.getItem(AUTH_KEY)) || {};
+    const raw = localStorage.getItem(AUTH_KEY);
+    return raw ? JSON.parse(raw) : {};
   } catch {
     return {};
   }
 }
 
 function setCurrentUser(username) {
-  localStorage.setItem('destinedToBeCurrentUser', username);
+  localStorage.setItem(CURRENT_KEY, username);
 }
+
+// ===============================
+// AUTH VALIDATION
+// ===============================
+
+function validateCredentials(users, username, password) {
+  const record = users[username];
+  if (!record) return false;
+  if (record.password !== password) return false;
+  return true;
+}
+
+// ===============================
+// CINEMATIC HOOK
+// ===============================
+
+function playLoginCinematic() {
+  const overlay = document.getElementById("sgDiveOverlay");
+  if (!overlay) return;
+
+  overlay.classList.add("active", "dive-in");
+
+  setTimeout(() => {
+    overlay.classList.remove("dive-in");
+  }, 1100);
+
+  setTimeout(() => {
+    overlay.classList.remove("active");
+  }, 1500);
+}
+
+// ===============================
+// INIT
+// ===============================
 
 window.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('login-form');
@@ -25,24 +66,34 @@ window.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
+
     const username = usernameEl.value.trim();
     const password = passwordEl.value.trim();
-
     const users = loadUsers();
-    const record = users[username];
 
-    if (!record || record.password !== password) {
+    const valid = validateCredentials(users, username, password);
+
+    if (!valid) {
       errorEl.textContent = 'Invalid username or PIN.';
+      errorEl.classList.add("shake");
+      setTimeout(() => errorEl.classList.remove("shake"), 400);
       return;
     }
 
+    // Save current user
     setCurrentUser(username);
 
-    // Minimal: ensure state knows current username
+    // Update global state
     updateState({
-      user: { username },
+      user: { username }
     });
 
-    window.location.href = 'dashboard.html';
+    // Play sacred geometry dive
+    playLoginCinematic();
+
+    // Delay navigation for cinematic effect
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 900);
   });
 });
