@@ -1,408 +1,605 @@
-/* ------------------------------------------
-   DESTINED TO BE — NUMEROLOGY UI (NEW)
-   Clean, minimal, readings‑focused
-------------------------------------------- */
-
 :root {
-  --bg: #050507;
-  --surface: #0b0f1a;
-  --surface-light: #121726;
-  --primary: #ef4444;
-  --primary-soft: #7f1d1d;
-  --accent: #f97373;
-  --text: #ffffff;
-  --text-muted: #b9bfd3;
-  --radius: 18px;
-  --shadow: 0 14px 32px rgba(0,0,0,0.55);
+  --bg: #05060a;
+  --bg-elevated: #0b0d14;
+  --bg-card: #101321;
+  --accent: #6b7bff;
+  --accent-soft: rgba(107, 123, 255, 0.2);
+  --accent-strong: #9aa5ff;
+  --danger: #ff4b6b;
+  --text: #f5f6ff;
+  --text-soft: #a5a8c5;
+  --border-subtle: #1b1f33;
+  --radius-card: 14px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+
+  /* Page images (override paths in your app) */
+  --page-1: url('/images/page-1.jpg');
+  --page-2: url('/images/page-2.jpg');
+  --page-3: url('/images/page-3.jpg');
+  --page-4: url('/images/page-4.jpg');
+  --page-5: url('/images/page-5.jpg');
+  --page-6: url('/images/page-6.jpg');
+  --page-7: url('/images/page-7.jpg');
+  --page-8: url('/images/page-8.jpg');
+  --page-9: url('/images/page-9.jpg');
+  --page-10: url('/images/page-10.jpg');
 }
 
-/* RESET */
-
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: radial-gradient(circle at top, #111827 0%, #050507 60%, #000 100%);
+  padding: 0;
+  min-height: 100%;
+  background: radial-gradient(circle at top, #151a33 0, #05060a 55%, #020308 100%);
   color: var(--text);
+  font-family: var(--font-main);
+  overflow-x: hidden;
 }
 
-/* LAYOUT */
+/* Root app shell */
 
-.app-body {
+.app-root {
+  position: relative;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.content {
-  padding: 16px;
-}
-
-/* TOPBAR */
-
-.topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.topbar-left h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.subhead {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.tier-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  background: rgba(239,68,68,0.2);
-  border: 1px solid rgba(239,68,68,0.7);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-/* DASHBOARD GRID */
-
-.dashboard-grid {
-  display: grid;
-  gap: 14px;
-}
-
-/* CARDS */
-
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 16px;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: var(--shadow);
-}
-
-.card h3 {
-  margin: 0 0 12px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* BUTTON GRID */
-
-.link-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-/* BUTTONS — NUMEROLOGY STYLE */
-
-button {
-  font: inherit;
-  cursor: pointer;
-  border-radius: 12px;
-  padding: 12px;
-  border: none;
-  transition: 0.25s ease;
-  font-weight: 500;
-}
-
-/* Primary (highlighted reading) */
-.primary-btn {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: var(--text);
-  box-shadow: 0 0 12px rgba(239,68,68,0.35);
-}
-
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px rgba(239,68,68,0.55);
-}
-
-/* Secondary (normal reading) */
-.secondary-btn {
-  background: var(--surface-light);
-  color: var(--text-muted);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.secondary-btn:hover {
-  color: var(--text);
-  border-color: rgba(255,255,255,0.18);
-  transform: translateY(-2px);
-}
-
-/* FOOTER NAV */
-
-.footer-nav {
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 12px;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(6px);
-  border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-.footer-nav button {
-  flex: 1;
-  margin: 0 4px;
-  padding: 10px 0;
-  border-radius: 999px;
-  background: var(--surface-light);
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.footer-nav button:hover {
-  background: var(--primary-soft);
   color: var(--text);
 }
 
-/* ACTIVE FOOTER BUTTON */
-.footer-nav button.active {
-  background: linear-gradient(135deg, var(--primary-soft), var(--primary));
-  color: #fff;
-}
-.deck-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+/* ===========================
+   3. Cinematic background pages
+   =========================== */
+
+.bg-pages-layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -2;
+  pointer-events: none;
+  background: radial-gradient(circle at top, #151a33 0, #05060a 55%, #020308 100%);
 }
 
-.tarot-card {
-  width: 90px;
-  height: 150px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: radial-gradient(circle at top, #1f2937 0%, #020617 70%);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+/* Single active full-screen page */
+.bg-page-active {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(1.1) contrast(1.05) brightness(0.9);
+  transform-origin: center;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+/* Hovering / parallax pages behind */
+.bg-page-floating {
+  position: absolute;
+  width: 60vw;
+  max-width: 720px;
+  aspect-ratio: 3 / 4;
+  background-size: cover;
+  background-position: center;
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+  opacity: 0.12;
+  filter: blur(2px) saturate(1.1);
+  transform-origin: center;
+  transition: transform 1.2s ease, opacity 1.2s ease;
+}
+
+/* Example positions for floating pages */
+.bg-page-floating.pos-1 { top: 8%; left: -10%; transform: rotate(-8deg); }
+.bg-page-floating.pos-2 { top: 18%; right: -12%; transform: rotate(7deg); }
+.bg-page-floating.pos-3 { bottom: -6%; left: 5%; transform: rotate(4deg); }
+.bg-page-floating.pos-4 { bottom: 4%; right: 2%; transform: rotate(-5deg); }
+.bg-page-floating.pos-5 { top: 40%; left: 25%; transform: rotate(2deg); }
+.bg-page-floating.pos-6 { top: 10%; left: 40%; transform: rotate(-3deg); }
+.bg-page-floating.pos-7 { bottom: 20%; right: 30%; transform: rotate(5deg); }
+
+/* On navigation, we can slightly shift them */
+.bg-pages-layer.nav-transition .bg-page-floating {
+  opacity: 0.18;
+  transform: translateY(-10px) scale(1.02) rotate(0deg);
+}
+
+/* ===========================
+   4. Sacred geometry dive intro
+   =========================== */
+
+.sg-dive-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: radial-gradient(circle at center, rgba(107, 123, 255, 0.18), rgba(0, 0, 0, 0.96));
+  opacity: 0;
+  transform: scale(1.1);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.sg-dive-overlay.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.sg-dive-mandala {
+  width: min(420px, 70vw);
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, rgba(154, 165, 255, 0.4), transparent 60%),
+    conic-gradient(from 0deg, rgba(107, 123, 255, 0.8), rgba(255, 75, 107, 0.7), rgba(154, 165, 255, 0.9), rgba(107, 123, 255, 0.8));
+  box-shadow:
+    0 0 40px rgba(154, 165, 255, 0.7),
+    0 0 120px rgba(0, 0, 0, 0.9);
   position: relative;
-  font-size: 11px;
-  text-align: center;
-  padding: 6px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  animation: sg-spin 18s linear infinite;
 }
 
-.tarot-card.back::before {
-  content: "✶";
+/* Inner geometry layers */
+.sg-dive-mandala::before,
+.sg-dive-mandala::after {
+  content: '';
   position: absolute;
-  top: 8px;
-  left: 8px;
-  font-size: 14px;
-  opacity: 0.7;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 246, 255, 0.12);
+  box-shadow: 0 0 30px rgba(107, 123, 255, 0.4);
 }
 
-.tarot-card.back::after {
-  content: "✶";
+.sg-dive-mandala::after {
+  inset: 26%;
+  border-radius: 0;
+  border: 1px solid rgba(154, 165, 255, 0.35);
+  transform: rotate(45deg);
+}
+
+/* Triangles, lines, etc. */
+.sg-dive-layer {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
-  font-size: 14px;
-  opacity: 0.7;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px dashed rgba(245, 246, 255, 0.18);
+  mix-blend-mode: screen;
 }
 
-.tarot-card-label {
-  z-index: 1;
-  color: #e5e7eb;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.sg-dive-layer.triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  border-radius: 0;
+  border: 1px solid rgba(255, 75, 107, 0.6);
 }
 
-.tarot-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.8);
+.sg-dive-layer.infinity {
+  inset: 30%;
+  border-radius: 50%;
+  border: none;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(154, 165, 255, 0.9) 0, transparent 40%),
+    radial-gradient(circle at 70% 50%, rgba(255, 75, 107, 0.9) 0, transparent 40%);
+  filter: blur(1px);
+  opacity: 0.9;
 }
 
-.tarot-card.picked {
-  border-color: rgba(239,68,68,0.9);
-  box-shadow: 0 0 18px rgba(239,68,68,0.6);
+/* Dive animation when entering app or changing page */
+.sg-dive-overlay.dive-in {
+  animation: sg-dive-in 1.1s ease forwards;
 }
 
-.tarot-card.flipped {
-  background: radial-gradient(circle at top, #ef4444 0%, #111827 70%);
+@keyframes sg-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-.chosen-cards {
+@keyframes sg-dive-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+/* ===========================
+   5. Layout: topbar, content, cards
+   =========================== */
+
+.landing-body,
+.auth-body,
+.app-body {
+  min-height: 100vh;
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-body {
   flex-direction: column;
-  gap: 8px;
+  position: relative;
+  z-index: 1;
 }
 
-.tarot-card.chosen {
+.topbar {
   width: 100%;
-  height: auto;
-  align-items: flex-start;
-  padding: 10px;
-}
-
-.tarot-card-title {
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.tarot-card-meaning {
-  font-size: 12px;
-  color: #cbd5f5;
-}
-/* Bubble Inputs */
-.bubble-input {
-  width: 100%;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(11,16,32,0.85);
-  color: var(--text-main);
-  font-size: 14px;
-  transition: 0.25s ease;
-}
-
-.bubble-input:focus {
-  outline: none;
-  border-color: rgba(239,68,68,0.8);
-  box-shadow: 0 0 12px rgba(239,68,68,0.4);
-}
-
-/* Bubble Dropdown */
-.bubble-select {
-  width: 100%;
-  padding: 12px 14px;
-  margin-top: 6px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: rgba(11,16,32,0.85);
-  color: var(--text-main);
-  font-size: 14px;
-  appearance: none;
-  transition: 0.25s ease;
-}
-
-.bubble-select:focus {
-  outline: none;
-  border-color: rgba(239,68,68,0.8);
-  box-shadow: 0 0 12px rgba(239,68,68,0.4);
-}
-
-/* Dropdown arrow */
-.bubble-select {
-  background-image: linear-gradient(135deg, rgba(239,68,68,0.4), rgba(11,16,32,0.85));
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 12px;
-}
-.calendar-controls {
+  max-width: 960px;
+  margin: 16px auto 0;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  background: linear-gradient(135deg, #0b0d14, #101321);
+  border-bottom: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(18px);
 }
 
-#calendar-label {
-  font-weight: 600;
+.topbar h2 {
+  margin: 0;
+  font-size: 1.1rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 13px;
 }
 
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.calendar-day {
-  min-height: 64px;
-  border-radius: 12px;
-  padding: 6px;
-  font-size: 11px;
-  background: rgba(11,16,32,0.9);
-  border: 1px solid rgba(255,255,255,0.06);
-  cursor: pointer;
+.content {
+  width: 100%;
+  max-width: 960px;
+  margin: 16px auto 32px;
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  transition: 0.2s ease;
+  gap: 16px;
 }
 
-.calendar-day-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* Typography */
 
-.calendar-day-number {
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 8px;
   font-weight: 600;
 }
 
-.calendar-day-today {
-  border-color: rgba(239,68,68,0.9);
-  box-shadow: 0 0 10px rgba(239,68,68,0.5);
+p {
+  margin: 0 0 8px;
+  color: var(--text-soft);
 }
 
-.calendar-day:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+.subtitle,
+.landing-subtitle {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  color: var(--text-soft);
 }
 
-.calendar-day-labels {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
+/* Cards */
+
+.card {
+  background: radial-gradient(circle at top left, #181c33 0, #101321 40%, #080914 100%);
+  border-radius: var(--radius-card);
+  padding: 16px 16px 18px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
 }
 
-.cycle-pill {
-  border-radius: 999px;
-  padding: 1px 6px;
-  font-size: 9px;
-  background: rgba(31,41,55,0.9);
-  color: #e5e7eb;
-}
-
-.cycle-pill.personal-day {
-  background: rgba(239,68,68,0.8);
-}
-
-.cycle-pill.personal-month {
-  background: rgba(59,130,246,0.8);
-}
-
-.cycle-pill.personal-year {
-  background: rgba(16,185,129,0.8);
-}
-
-.cycle-pill.universal-day {
-  background: rgba(234,179,8,0.8);
-}
-
-.cycle-toggle-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
+.card h3 {
   margin-bottom: 8px;
 }
 
-.cycle-toggle-row label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.card h4 {
+  margin-top: 4px;
+  margin-bottom: 6px;
 }
 
-.day-details {
-  font-size: 13px;
-  line-height: 1.5;
+/* Buttons */
+
+.btn,
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  text-decoration: none;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background 0.16s ease,
+    filter 0.16s ease;
+}
+
+.primary-btn,
+.btn.primary-btn {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #05060a;
+  box-shadow: 0 10px 24px rgba(107, 123, 255, 0.5);
+}
+
+.primary-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(107, 123, 255, 0.7);
+  filter: brightness(1.05);
+}
+
+.secondary-btn,
+.btn.secondary-btn {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-soft);
+  border: 1px solid var(--border-subtle);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.danger-btn {
+  background: linear-gradient(135deg, var(--danger), #ff7b8f);
+  color: #05060a;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-soft);
+  font-size: 1rem;
+}
+
+/* Forms */
+
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="month"],
+input[type="file"],
+textarea,
+select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(5, 6, 10, 0.9);
+  color: var(--text);
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft);
+}
+
+/* Landing */
+
+.landing-title {
+  font-size: 1.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.landing-actions {
+  margin: 20px 0 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.landing-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.info-card {
+  background: rgba(5, 6, 10, 0.7);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+}
+
+.info-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.info-card ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.landing-footer {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+/* Tier pill */
+
+.tier-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(107, 123, 255, 0.12);
+  color: var(--accent-strong);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Lists */
+
+.number-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.number-list li {
+  margin-bottom: 4px;
+}
+
+/* Avatar */
+
+.avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: radial-gradient(circle at top, #2a3058, #101321);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.file-label {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.file-label input {
+  display: none;
+}
+
+/* Toggles */
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+/* Error / tip */
+
+.error {
+  color: var(--danger);
+  font-size: 0.8rem;
+}
+
+.tip,
+.pro-hint {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  margin-top: 6px;
+}
+
+/* Pro lock */
+
+.pro-only.locked {
+  position: relative;
+  opacity: 0.6;
+}
+
+.pro-only.locked::after {
+  content: 'Pro';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+/* Misc */
+
+.hidden {
+  display: none !important;
+}
+
+.link-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.link-list li {
+  margin-bottom: 6px;
+}
+
+.link-list a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.link-list a:hover {
+  text-shadow: 0 0 6px var(--accent-soft);
+}
+
+pre {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 8px;
+  font-size: 0.75rem;
+  overflow-x: auto;
+}
+
+/* Responsive */
+
+@media (max-width: 720px) {
+  .topbar {
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  .landing-info {
+    grid-template-columns: 1fr;
+  }
+
+  .bg-page-floating {
+    width: 80vw;
+  }
 }
