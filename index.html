@@ -6,15 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="images/icon-192.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
 
-  <!-- Global styles -->
-  <link rel="stylesheet" href="styles/styles.css">
-  <link rel="stylesheet" href="styles/theme.css">
-  <link rel="stylesheet" href="styles/components.css">
-
-  <!-- Cinematic background + geometry universe -->
-  <link rel="stylesheet" href="styles/cosmic.css">
+  <!-- Only ONE stylesheet -->
+  <link rel="stylesheet" href="styles.css">
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -26,39 +21,26 @@
   </script>
 </head>
 
-<!-- PAGE IDENTIFIER FOR BACKGROUND -->
-<body class="landing-body cosmic-root" data-page="landing">
+<body class="landing-body" data-page="landing">
 
   <!-- PAGE FLIP INTRO -->
   <div id="pageflip-sequence"></div>
 
-  <!-- BACKGROUND LAYERS -->
-  <div class="bg-pages-layer" id="bgPagesLayer"></div>
-
-  <!-- SACRED GEOMETRY DIVE -->
-  <div class="sg-dive-overlay" id="sgDiveOverlay">
-    <div class="sg-dive-mandala">
-      <div class="sg-dive-layer"></div>
-      <div class="sg-dive-layer triangle"></div>
-      <div class="sg-dive-layer infinity"></div>
-    </div>
-  </div>
-
   <!-- LANDING CONTENT -->
-  <div class="landing-container cosmic-foreground">
+  <div class="landing-container">
     <header class="landing-header">
-      <h1 class="landing-title cosmic-title">Destined to Be</h1>
-      <p class="landing-subtitle cosmic-subtitle">Midnight numerology with a live Spirit Guide.</p>
+      <h1 class="landing-title">Destined to Be</h1>
+      <p class="landing-subtitle">Midnight numerology with a live Spirit Guide.</p>
     </header>
 
-    <section class="landing-actions cosmic-actions">
-      <a href="login.html" class="btn primary-btn cosmic-btn">Login</a>
-      <a href="signup.html" class="btn secondary-btn cosmic-btn">Create Account</a>
-      <a href="sacred-geometry.html" class="btn secondary-btn cosmic-btn">Sacred Geometry</a>
+    <section class="landing-actions">
+      <a href="login.html" class="btn primary-btn">Login</a>
+      <a href="signup.html" class="btn secondary-btn">Create Account</a>
+      <a href="sacred-geometry.html" class="btn secondary-btn">Sacred Geometry</a>
     </section>
 
-    <section class="landing-info cosmic-info">
-      <div class="info-card cosmic-card">
+    <section class="landing-info">
+      <div class="info-card">
         <h3>Free Tier Includes</h3>
         <ul>
           <li>Life Path & Birthday Numbers</li>
@@ -68,7 +50,7 @@
         </ul>
       </div>
 
-      <div class="info-card cosmic-card">
+      <div class="info-card">
         <h3>Pro Tier ($6 One-Time)</h3>
         <ul>
           <li>Full Numerology Engine (30+ calculations)</li>
@@ -81,7 +63,7 @@
         </ul>
       </div>
 
-      <div class="info-card cosmic-card">
+      <div class="info-card">
         <h3>Sacred Geometry</h3>
         <ul>
           <li>Core shapes & their meanings</li>
@@ -94,7 +76,7 @@
       </div>
     </section>
 
-    <footer class="landing-footer cosmic-footer">
+    <footer class="landing-footer">
       <p>Stored locally. No servers. Your map stays on your device.</p>
       <p>Upgrade anytime for a one-time $6 unlock.</p>
     </footer>
@@ -106,9 +88,6 @@
       setTimeout(() => document.body.classList.add("ui-ready"), 2200);
     });
   </script>
-
-  <!-- CINEMATIC PAGE FLIP ENGINE -->
-  <script src="js/cosmic-engine.js"></script>
 
 </body>
 </html>
