@@ -5,8 +5,13 @@
   <title>Spirit Guide – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="styles/styles.css">
 
+  <!-- Spirit Guide logic -->
   <script type="module" src="js/state.js"></script>
   <script type="module" src="js/tier.js"></script>
   <script type="module" src="js/spirit/spirit.js"></script>
@@ -14,7 +19,12 @@
   <script type="module" src="js/spirit/guide-modes.js"></script>
 </head>
 
-<body class="app-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="app-body" data-page="spirit-guide">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
+
   <header class="topbar">
     <h2>Spirit Guide</h2>
     <a href="settings.html" class="icon-btn">⚙</a>
@@ -41,5 +51,13 @@
       <div id="guide-output" class="guide-output"></div>
     </section>
   </main>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
+
 </body>
 </html>
