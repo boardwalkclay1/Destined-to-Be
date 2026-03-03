@@ -5,11 +5,22 @@
   <title>Journal – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Journal logic -->
   <script type="module" src="js/journal/journal.js"></script>
 </head>
 
-<body class="app-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="app-body" data-page="journal">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
+
   <header class="topbar">
     <h2>Spiritual Journal</h2>
     <a href="dashboard.html" class="icon-btn">🏠</a>
@@ -48,5 +59,13 @@
     </section>
 
   </main>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
+
 </body>
 </html>
