@@ -5,11 +5,22 @@
   <title>Meanings – Destined to Be</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/icon-192.png">
+
+  <!-- Global styles -->
   <link rel="stylesheet" href="styles/styles.css">
+
+  <!-- Meanings logic -->
   <script type="module" src="js/meanings/meanings.js"></script>
 </head>
 
-<body class="app-body">
+<!-- PAGE IDENTIFIER FOR BACKGROUND -->
+<body class="app-body" data-page="meanings">
+
+  <!-- PAGE FLIP INTRO -->
+  <div id="pageflip-sequence"></div>
+
   <header class="topbar">
     <h2>Numerology Meanings</h2>
     <a href="dev-tools.html" class="icon-btn">🛠</a>
@@ -33,5 +44,13 @@
       <button id="save-meaning" class="primary-btn">Save Meaning</button>
     </section>
   </main>
+
+  <!-- UI REVEAL AFTER FLIP -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => document.body.classList.add("ui-ready"), 2200);
+    });
+  </script>
+
 </body>
 </html>
