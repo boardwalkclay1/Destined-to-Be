@@ -1,13 +1,12 @@
-// service-worker.js
-const CACHE_NAME = "destined-cache-v1";
+const CACHE_NAME = "destined-cache-v4";
 
 const FILES_TO_CACHE = [
-  "/", 
+  "/",
   "/index.html",
-  "/styles.css",
+  "/styles/styles.css",
   "/app.js",
 
-  // Icons
+  // Icons (safe mode: load individually)
   "/icons/icon-192.png",
   "/icons/numbers.jpg",
   "/icons/daily-energy.jpg",
@@ -17,48 +16,33 @@ const FILES_TO_CACHE = [
   "/icons/Compatibility.jpg",
   "/icons/spirit-guide.jpg",
   "/icons/sacred-geometry.jpg",
-  "/icons/meanings.jpg",
-
-  // Core JS modules
-  "/js/state.js",
-  "/js/tier.js",
-
-  // Pages
-  "/login.html",
-  "/signup.html",
-  "/dashboard.html",
-  "/number.html",
-  "/spirit.html",
-  "/daily_energy.html",
-  "/compatibility.html",
-  "/meanings.html",
-  "/journal.html",
-  "/reading.html",
-  "/sacred-geometry.html"
+  "/icons/meanings.jpg"
 ];
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(async cache => {
+      for (const file of FILES_TO_CACHE) {
+        try {
+          await cache.add(file);
+        } catch (err) {
+          console.warn("Skipping missing file:", file);
+        }
+      }
+    })
   );
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) return caches.delete(key);
-        })
-      )
+      Promise.all(keys.map(key => key !== CACHE_NAME && caches.delete(key)))
     )
   );
 });
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request).then(res => res || fetch(event.request))
   );
 });
